@@ -9,7 +9,7 @@ from msd2.readin.filters import (
     unique_unit_ids,
     valid_geom_only_unit_ids,
 )
-from msd2.readin.utils import access_dataset
+from msd2.readin.access import access_dataset
 
 
 class DatasetSummary(NamedTuple):
@@ -53,8 +53,7 @@ def find_and_write_valid_unit_ids():
     id_sets = [set(i) for i in id_list]
     s1, s2, s3, s4 = id_sets
     valid_ids = list(s1.intersection(s2, s3, s4))
-    valid_id_ints = [int(i) for i in valid_ids]
-    write_json(valid_id_ints, DynamicPaths.valid_ids_json, OVERWRITE=True)
+    write_json(valid_ids, DynamicPaths.valid_ids_json, OVERWRITE=True)
 
 
 if __name__ == "__main__":

@@ -1,15 +1,10 @@
 import polars as pl
-from utils4plans.io import read_json
-from msd2.paths import DynamicPaths
 from msd2.readin.interfaces import MSDSchema
 from dataframely import LazyFrame
 import shapely as sp
 import warnings
-from msd2.config import NUM_SAMPLES, SEED
-import numpy as np
 
 
-# these first two are more utils..
 def is_valid_geom(geom: str):
     p = sp.from_wkt(geom)
     if p.is_valid and p.geom_type == "Polygon":
@@ -68,17 +63,3 @@ def unique_unit_ids(df: LazyFrame[MSDSchema]) -> list[int]:
 def all_unit_ids(df: LazyFrame[MSDSchema]):
     res = df.select(pl.col("unit_id")).unique()
     return get_unit_ids(res)
-    # return UnitIDSchema.validate(res)
-
-
-def sample_unit_ids(num_samples: int = NUM_SAMPLES, seed: int = SEED) -> list[int]:
-
-    valid_unit_ids: list[int] = read_json(DynamicPaths.valid_ids_json)
-    assert num_samples < len(
-        valid_unit_ids
-    ), f"N_samples={num_samples} > n_valid_ids {len(valid_unit_ids)}"
-
-    rng = np.random.default_rng(seed)
-    sample_ids = rng.choice(valid_unit_ids, size=num_samples, replace=False)
-
-    return sorted(sample_ids.tolist())

@@ -1,4 +1,4 @@
-from msd2.readin.filters import sample_unit_ids
+from msd2.readin.access import sample_unit_ids
 
 
 def test_many_set_interesection():

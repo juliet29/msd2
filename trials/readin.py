@@ -1,11 +1,10 @@
 from msd2.readin.scripts import DatasetSummary
-from msd2.readin.utils import access_dataset
+from msd2.readin.access import access_dataset, access_sample_dataset, sample_unit_ids
 from msd2.readin.filters import (
     all_unit_ids,
     sufficient_areas_unit_ids,
     unique_unit_ids,
     valid_geom_only_unit_ids,
-    sample_unit_ids,
 )
 
 
@@ -46,4 +45,5 @@ def summarize_dataset():
 
 
 if __name__ == "__main__":
-    test_sample_ids()
+    df = access_sample_dataset(10)
+    print(df.collect())

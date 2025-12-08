@@ -1,5 +1,4 @@
 import dataframely as dy
-from dataframely import DataFrame
 
 
 class MSDSchema(dy.Schema):
@@ -18,11 +17,3 @@ class MSDSchema(dy.Schema):
     height = dy.Float64(nullable=False)
     zoning = dy.String(nullable=False)
     roomtype = dy.String(nullable=False)
-
-
-class UnitIDSchema(dy.Schema):
-    unit_id = dy.Float64(nullable=False)
-
-
-def get_size_of_unit_id_df(df: DataFrame[UnitIDSchema]):
-    return df.get_column("unit_id").len()
