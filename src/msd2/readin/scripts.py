@@ -1,6 +1,6 @@
 from typing import NamedTuple
+from rich import print
 from tabulate import tabulate
-from dataframely import LazyFrame
 from utils4plans.io import write_json
 from msd2.paths import DynamicPaths
 from msd2.readin.filters import (
@@ -9,7 +9,6 @@ from msd2.readin.filters import (
     unique_unit_ids,
     valid_geom_only_unit_ids,
 )
-from msd2.readin.interfaces import MSDSchema, get_size_of_unit_id_df
 from msd2.readin.utils import access_dataset
 
 
@@ -20,24 +19,17 @@ class DatasetSummary(NamedTuple):
     unique_plans: int
 
     def print(self):
-        tabulate(self._asdict())
+        data = [[k, v] for k, v in self._asdict().items()]
+        t = tabulate(data)
+        print(t)
+        return t
 
 
-def write_unit_ids(df: LazyFrame[MSDSchema]):
-    unique_ids = df.unique(subset=["unit_id"]).collect().get_column("unit_id").to_list()
-    write_json(unique_ids, DynamicPaths.msd_unit_ids)
-
-
-def write_all_msd_ids():
+def get_id_list():
     df = access_dataset()
-    write_unit_ids(df)
-
-
-def summarize_dataset():
-    df = access_dataset()
-    summary = list(
+    id_list = list(
         map(
-            lambda fx: get_size_of_unit_id_df(fx(df)),
+            lambda fx: fx(df),
             [
                 all_unit_ids,
                 valid_geom_only_unit_ids,
@@ -46,10 +38,24 @@ def summarize_dataset():
             ],
         )
     )
-    ds = DatasetSummary(*summary)
+    return id_list
+
+
+def summarize_dataset():
+    id_list = get_id_list()
+    ds = DatasetSummary(*[len(i) for i in id_list])
     ds.print()
     return ds
 
 
+def find_and_write_valid_unit_ids():
+    id_list = get_id_list()
+    id_sets = [set(i) for i in id_list]
+    s1, s2, s3, s4 = id_sets
+    valid_ids = list(s1.intersection(s2, s3, s4))
+    valid_id_ints = [int(i) for i in valid_ids]
+    write_json(valid_id_ints, DynamicPaths.valid_ids_json, OVERWRITE=True)
+
+
 if __name__ == "__main__":
-    summarize_dataset()
+    find_and_write_valid_unit_ids()

@@ -7,4 +7,5 @@ static_paths = StaticPaths("", BASE_PATH)
 
 
 class DynamicPaths:
-    msd_unit_ids = static_paths.temp / "msd_unit_ids.json"
+    msd_stats = static_paths.temp / "msd_stats"
+    valid_ids_json = msd_stats / "valid_ids.json"
