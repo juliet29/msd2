@@ -3,6 +3,7 @@ import polars as pl
 from dataframely import LazyFrame
 from kagglehub import KaggleDatasetAdapter
 
+from msd2.readin.filters import filter_to_areas
 from msd2.readin.interfaces import MSDSchema
 
 from utils4plans.io import read_json
@@ -14,7 +15,6 @@ import numpy as np
 def access_dataset() -> LazyFrame[MSDSchema]:
     file_path = "mds_V2_5.372k.csv"
 
-    # Load the latest version
     lf = kagglehub.dataset_load(
         KaggleDatasetAdapter.POLARS,
         "caspervanengelenburg/modified-swiss-dwellings",
@@ -37,8 +37,18 @@ def sample_unit_ids(num_samples: int = NUM_SAMPLES, seed: int = SEED) -> list[in
     return sorted(sample_ids.tolist())
 
 
-def access_sample_dataset(num_samples: int = NUM_SAMPLES) -> LazyFrame[MSDSchema]:
+def access_sample_datasets(num_samples: int = NUM_SAMPLES) -> LazyFrame[MSDSchema]:
     sample_ids = sample_unit_ids(num_samples)
     print(f"Sampled IDs: {sample_ids}")
     res = access_dataset().filter(pl.col("unit_id").is_in(sample_ids))
     return MSDSchema.cast(res)
+
+
+def access_one_sample_dataset(
+    sample_id: int | None = None, seed: int = SEED
+) -> tuple[int, LazyFrame[MSDSchema]]:
+    if not sample_id:
+        sample_id = sample_unit_ids(1, seed=seed)[0]
+    print(f"Sampled ID: {sample_id}")
+    res = access_dataset().pipe(filter_to_areas).filter(pl.col("unit_id") == sample_id)
+    return sample_id, MSDSchema.cast(res)

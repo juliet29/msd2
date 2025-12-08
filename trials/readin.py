@@ -1,5 +1,5 @@
 from msd2.readin.scripts import DatasetSummary
-from msd2.readin.access import access_dataset, access_sample_dataset, sample_unit_ids
+from msd2.readin.access import access_dataset, access_sample_datasets, sample_unit_ids
 from msd2.readin.filters import (
     all_unit_ids,
     sufficient_areas_unit_ids,
@@ -45,5 +45,5 @@ def summarize_dataset():
 
 
 if __name__ == "__main__":
-    df = access_sample_dataset(10)
+    df = access_sample_datasets(10)
     print(df.collect())
