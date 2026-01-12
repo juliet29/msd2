@@ -1,0 +1,3 @@
+pathvars:
+  input_loc: "static/_01_inputs/examples"
+  output_loc: "static/_04_temp/examples"

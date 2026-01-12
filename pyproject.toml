@@ -4,19 +4,25 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [
-    { name = "Juliet Nwagwu Ume-Ezeoke", email = "jnwagwu@stanford.edu" }
+  { name = "Juliet Nwagwu Ume-Ezeoke", email = "jnwagwu@stanford.edu" },
 ]
 requires-python = ">=3.13"
 dependencies = [
-    "dataframely>=2.1.0",
-    "kagglehub>=0.3.13",
-    "polymap",
-    "ptpython>=3.0.32",
-    "replan2eplus",
-    "svg2plan",
-    "tabulate>=0.9.0",
-    "utils4plans",
+  "cyclopts>=4.4.4",
+  "dataframely>=2.1.0",
+  "just>=0.8.165",
+  "kagglehub>=0.3.13",
+  "loguru>=0.7.3",
+  "polymap",
+  "ptpython>=3.0.32",
+  "replan2eplus",
+  "svg2plan",
+  "tabulate>=0.9.0",
+  "utils4plans",
 ]
+[project.scripts]
+msd2 = "msd2:main"
+cli = "msd2.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.8.3,<0.9.0"]

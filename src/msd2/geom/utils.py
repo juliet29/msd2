@@ -1,6 +1,12 @@
+from pathlib import Path
 from dataframely import DataFrame
+from polymap.json_interfaces import dump_layout, layout_to_model
 from polymap.geometry.ortho import FancyOrthoDomain
 from polymap.layout.interfaces import Layout
+from utils4plans.io import write_json
+from msd2.config import NUM_SAMPLES
+from msd2.paths import DynamicPaths
+from msd2.readin.access import access_one_sample_dataset, access_sample_datasets
 from msd2.readin.interfaces import MSDSchema
 from msd2.geom.interfaces import RoomData
 import shapely as sp
@@ -27,10 +33,32 @@ def df_unit_to_room_data(df: DataFrame[MSDSchema]):
     ]
     return rooms
 
-    pass
-
 
 def df_unit_to_layout(df: DataFrame[MSDSchema]):
     room_data = df_unit_to_room_data(df)
     doms = map(lambda x: FancyOrthoDomain(x.coords, x.name), room_data)
     return Layout(list(doms))
+
+
+def unit_id_to_file(id: int, path: Path):
+    id, df = access_one_sample_dataset(id)
+    layout = df_unit_to_layout(df.collect())
+    layout_str = dump_layout(layout)
+    write_json(layout_str, path)
+
+
+def sample_unit_ids_to_files(
+    num_samples: int = NUM_SAMPLES, path: Path = DynamicPaths.workflow_inputs
+):
+
+    df = access_sample_datasets(num_samples).collect()
+    for name, data in df.group_by("unit_id"):
+        d = MSDSchema.validate(data)
+        layout = df_unit_to_layout(d)
+        layout_str = layout_to_model(layout).model_dump()
+
+        n = int(name[0])
+
+        curr_path = path / f"{str(n)}.json"
+        write_json(layout_str, curr_path, OVERWRITE=True)
+        # logger.info(curr_path)

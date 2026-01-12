@@ -8,7 +8,7 @@ from msd2.readin.access import access_one_sample_dataset
 
 def show_rotate():
     # id, layout = get_one_msd_layout()
-    id, df_id = access_one_sample_dataset(seed=15)
+    id, df_id = access_one_sample_dataset(sample_id=95904)
     layout = df_unit_to_layout(df_id.collect())
 
     angle, lay2 = rotate_layout(layout)

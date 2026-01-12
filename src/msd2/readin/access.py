@@ -3,6 +3,7 @@ import polars as pl
 from dataframely import LazyFrame
 from kagglehub import KaggleDatasetAdapter
 
+from loguru import logger
 from msd2.readin.filters import filter_to_areas
 from msd2.readin.interfaces import MSDSchema
 
@@ -39,8 +40,13 @@ def sample_unit_ids(num_samples: int = NUM_SAMPLES, seed: int = SEED) -> list[in
 
 def access_sample_datasets(num_samples: int = NUM_SAMPLES) -> LazyFrame[MSDSchema]:
     sample_ids = sample_unit_ids(num_samples)
-    print(f"Sampled IDs: {sample_ids}")
-    res = access_dataset().filter(pl.col("unit_id").is_in(sample_ids))
+
+    logger.info(f"Sampled IDs: {sample_ids}")
+    res = (
+        access_dataset()
+        .pipe(filter_to_areas)
+        .filter(pl.col("unit_id").is_in(sample_ids))
+    )
     return MSDSchema.cast(res)
 
 
