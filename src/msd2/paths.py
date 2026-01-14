@@ -11,3 +11,7 @@ class DynamicPaths:
     valid_ids_json = msd_stats / "valid_ids.json"
     workflow = static_paths.temp / "workflow"
     workflow_inputs = workflow / "inputs"
+    workflow_outputs = workflow / "outputs"
+    weather_pa2024 = (
+        BASE_PATH / "../../../weather_data" / "CA_PALO-ALTO-AP_724937S_20.epw"
+    )

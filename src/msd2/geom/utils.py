@@ -1,21 +1,24 @@
 from pathlib import Path
+
+import shapely as sp
 from dataframely import DataFrame
-from polymap.json_interfaces import dump_layout, layout_to_model
 from polymap.geometry.ortho import FancyOrthoDomain
+from polymap.json_interfaces import layout_to_model
 from polymap.layout.interfaces import Layout
 from utils4plans.io import write_json
-from msd2.config import NUM_SAMPLES
-from msd2.paths import DynamicPaths
-from msd2.readin.access import access_one_sample_dataset, access_sample_datasets
-from msd2.readin.interfaces import MSDSchema
+
+from msd2.config import NUM_SAMPLES, PRECISION
 from msd2.geom.interfaces import RoomData
-import shapely as sp
+from msd2.paths import DynamicPaths
+from msd2.readin.access import access_sample_datasets
+from msd2.readin.interfaces import MSDSchema
 
 
 def msd_geom_to_shapely(geom: str) -> sp.Polygon:
     spgeo = sp.from_wkt(geom)
-    assert isinstance(spgeo, sp.Polygon)
-    return spgeo
+    spgeo_precise = sp.from_wkt(sp.to_wkt(spgeo, rounding_precision=PRECISION))
+    assert isinstance(spgeo_precise, sp.Polygon)
+    return spgeo_precise
 
 
 def df_unit_to_room_data(df: DataFrame[MSDSchema]):
@@ -40,11 +43,11 @@ def df_unit_to_layout(df: DataFrame[MSDSchema]):
     return Layout(list(doms))
 
 
-def unit_id_to_file(id: int, path: Path):
-    id, df = access_one_sample_dataset(id)
-    layout = df_unit_to_layout(df.collect())
-    layout_str = dump_layout(layout)
-    write_json(layout_str, path)
+# def unit_id_to_file(id: int, path: Path):
+#     id, df = access_one_sample_dataset(id)
+#     layout = df_unit_to_layout(df.collect())
+#     layout_str = dump_layout(layout)
+#     write_json(layout_str, path)
 
 
 def sample_unit_ids_to_files(

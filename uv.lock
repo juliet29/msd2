@@ -1839,6 +1839,7 @@ dependencies = [
     { name = "snakemake" },
     { name = "tomli-w" },
     { name = "types-networkx" },
+    { name = "utils4plans" },
     { name = "whenever" },
 ]
 
@@ -1861,6 +1862,7 @@ requires-dist = [
     { name = "snakemake", specifier = ">=9.14.5" },
     { name = "tomli-w", specifier = ">=1.2.0" },
     { name = "types-networkx", specifier = ">=3.5.0.20251106" },
+    { name = "utils4plans", directory = "../../utils4plans" },
     { name = "whenever", specifier = ">=0.9.3" },
 ]
 

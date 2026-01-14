@@ -1,24 +1,24 @@
 
 from pathlib import Path
 
-configfile: "example.yaml"
+configfile: "config/config.yaml"
 
 INPUT_PATH = config["pathvars"]["input_loc"]
 SAMPLES = [i.stem for i in Path(INPUT_PATH).iterdir() if i.suffix == ".json"]
-SMALL_SAMPLES = SAMPLES[0:5]
+SMALL_SAMPLES = SAMPLES[0:3]
   
 
 
 
 rule some:
   input:
-    expand("<output_loc>/{sample}/xmove/out.json", sample=SMALL_SAMPLES)
+    expand("<output_loc>/{sample}/ymove/out.json", sample=SMALL_SAMPLES)
 
 
 
 rule all:
   input:
-    expand("<output_loc>/{sample}/pull/gx/out.png", sample=SAMPLES)
+    expand("<output_loc>/{sample}/ymove/out.json", sample=SAMPLES)
 
 
 rule rejig:

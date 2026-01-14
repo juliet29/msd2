@@ -1,3 +1,7 @@
+# Custom 
+static/_04_temp/workflow/
+.snakemake/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
