@@ -1,17 +1,35 @@
 from pathlib import Path
+
+from replan2eplus.ops.subsurfaces.user_interfaces import EdgeGroup
 from msd2.eplus.interfaces import read_layout_to_ezcase_rooms
 from replan2eplus.ezcase.ez import EZ
 from replan2eplus.ops.zones.user_interface import Room
 from msd2.config import WEATHER_FILE
+from msd2.eplus.interfaces import EdgeGroupModel
+from polymap.scripts.preproc import get_case_name
 
-# from resp.config import ANALYSIS_PERIOD, INPUT_CAMPAIGN_NAME, WEATHER_FILE
-# from resp.eplus.campaign import campaign_data, campaign_defn
-# from resp.eplus.interfaces import make_details
-# from resp.paths import DynamicPaths
-#
+from msd2.eplus.utils import assess_surface_relations
 
 
-def generate_idf(rooms: list[Room], out_path: Path, run: bool = False):
+edge_groups_dict: dict[str, list[EdgeGroupModel]] = {
+    "18380": [
+        EdgeGroupModel(
+            edges=[("room_0", "corridor_4"), ("room_0", "living_dining_3")],
+            detail="door",
+            type_="Zone_Zone",
+        ),
+        EdgeGroupModel(
+            edges=[("room_0", "NORTH"), ("room_0", "WEST")],
+            detail="window",
+            type_="Zone_Direction",
+        ),
+    ]
+}
+
+
+def generate_idf(
+    rooms: list[Room], edge_groups: list[EdgeGroup], out_path: Path, run: bool = False
+):
     case = EZ(output_path=out_path, epw_path=WEATHER_FILE)
     case.add_zones(rooms)
 
@@ -19,6 +37,7 @@ def generate_idf(rooms: list[Room], out_path: Path, run: bool = False):
     #     edge_groups, make_details()  # pyright: ignore[reportArgumentType]
     # )
     # case.add_subsurfaces(subsurface_inputs)
+
     case.add_constructions()
     case.add_airflow_network()
     case.save_and_run(
@@ -29,8 +48,15 @@ def generate_idf(rooms: list[Room], out_path: Path, run: bool = False):
 
 def layout_to_idf(path: Path, out_path: Path, run: bool = False):
     rooms = read_layout_to_ezcase_rooms(path)
+    case_name = get_case_name(path)
 
-    # print(rooms)
-    case = generate_idf(rooms, out_path, run)
-    # bp = make_base_plot(case)
-    # bp.show()
+    # if case_name in edge_groups_dict.keys():
+    #     edge_group_models = edge_groups_dict[case_name]
+    #     edge_groups = [i.edge_group for i in edge_group_models]
+    # else:
+    #     edge_groups = []
+    edge_groups = []
+
+    case = generate_idf(rooms, edge_groups, out_path, run)
+
+    assess_surface_relations(case)

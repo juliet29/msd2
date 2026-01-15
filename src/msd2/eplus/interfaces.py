@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 
 from polymap.geometry.ortho import FancyOrthoDomain
 from replan2eplus.geometry.coords import Coord
@@ -7,27 +8,17 @@ from replan2eplus.ops.zones.user_interface import Room
 from utils4plans.io import read_json
 from msd2.config import ROOM_HEIGHT
 from polymap.json_interfaces import LayoutModel
-
-
-# class GeomRoom(BaseModel):
-#     name: str
-#     id: int
-#     coords: CoordsType
-#
-#     @property
-#     def ortho_domain(self):
-#         coords = map(lambda x: Coord(*x), self.coords)
-#         return OrthoDomain(list(coords))
-#
-#     @property
-#     def as_ezcase_room(self):
-#         return Room(self.id, self.name, self.ortho_domain, ROOM_HEIGHT)
-#
-#     @property
-#     def polymap_ortho_domain(self):
-#         coords = coords_type_list_to_coords(self.coords)
-#         return FancyOrthoDomain(coords, self.name)
-#
+from replan2eplus.ops.subsurfaces.interfaces import Location
+from replan2eplus.ops.subsurfaces.user_interfaces import (
+    Detail,
+    Dimension,
+)
+from pydantic import BaseModel
+from replan2eplus.ops.subsurfaces.user_interfaces import (
+    EdgeGroup,
+    EdgeGroupType,
+)
+from replan2eplus.ops.subsurfaces.interfaces import Edge
 
 
 class GeomPlan(LayoutModel):
@@ -43,19 +34,15 @@ class GeomPlan(LayoutModel):
         return rooms
 
 
-# class GeomPlan(BaseModel):
-#     rooms: list[GeomRoom]
-#
-#     @property
-#     def ezcase_rooms(self):
-#         res = map(lambda x: x.as_ezcase_room, self.rooms)
-#         return list(res)
-#
-#     @property
-#     def layout(self):
-#         res = map(lambda x: x.polymap_ortho_domain, self.rooms)
-#         return Layout(list(res))
-#
+class EdgeGroupModel(BaseModel):
+    edges: list[tuple[str, str]]
+    detail: str
+    type_: EdgeGroupType
+
+    @property
+    def edge_group(self):
+        edges = map(lambda x: Edge(*x), self.edges)
+        return EdgeGroup(list(edges), self.detail, self.type_)
 
 
 def read_layout_to_ezcase_rooms(path: Path):
@@ -64,8 +51,22 @@ def read_layout_to_ezcase_rooms(path: Path):
     return geom_plan.ezcase_rooms
 
 
-# def read_geoms_to_layout(path: Path):
-#     data = read_json(path)
-#     geom_plan = GeomPlan.model_validate({"rooms": data})
-#
-#     return geom_plan.layout
+def make_details():
+    door_detail = Detail(
+        Dimension(width=10, height=ROOM_HEIGHT * 0.7),
+        location=Location(
+            "bm", "SOUTH", "SOUTH"
+        ),  # TODO: create list of reasonable defaults, so dont have to think about this..
+        type_="Door",
+    )
+    window_detail = Detail(
+        Dimension(width=10, height=ROOM_HEIGHT * 0.5),
+        location=Location("mm", "CENTROID", "CENTROID"),
+        type_="Window",
+    )
+
+    detail_map: dict[Literal["window", "door"], Detail] = {
+        "window": window_detail,
+        "door": door_detail,
+    }
+    return detail_map
