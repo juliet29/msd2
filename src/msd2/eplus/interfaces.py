@@ -32,6 +32,12 @@ class GeomPlan(LayoutModel):
         return rooms
 
 
+def read_layout_to_ezcase_rooms(path: Path):
+    data = read_json(path)
+    geom_plan = GeomPlan.model_validate(data)
+    return geom_plan.ezcase_rooms
+
+
 DETAIL_TYPES = Literal["window", "door"]
 
 
@@ -42,51 +48,47 @@ def to_edge_group(
     return EdgeGroup(ep_edges, detail, type_)
 
 
-class IncomingEdgeGroups(NamedTuple):
+class DistinguishedEdgeGroups(NamedTuple):
     exterior_door: Iterable[MSDEdgeModel]
     interior_door: Iterable[MSDEdgeModel]
     window: Iterable[MSDEdgeModel]
     airboundary: Iterable[MSDEdgeModel]
 
+    @property
     def exterior_door_edges(self):
         return to_edge_group(self.exterior_door, "door", "Zone_Direction")
 
+    @property
     def interior_door_edges(self):
         return to_edge_group(self.interior_door, "door", "Zone_Zone")
 
+    @property
     def window_edges(self):
         return to_edge_group(self.window, "window", "Zone_Direction")
 
+    @property
     def airboundary_edges(self):
         return to_edge_group(
             self.airboundary, "door", "Zone_Zone"
         )  # TODO: this might be a special type
 
 
-class IncomingEgdes(MSDEdgesModel):
-    def distinguish_edge_group(self):
+class IncomingEgdesModel(MSDEdgesModel):
+    @property
+    def distinguished_edge_groups(self):
         ext = filter(lambda x: x.conn == "Entrance Door", self.edges)
         inte = filter(lambda x: x.conn == "Door", self.edges)
         window = filter(lambda x: x.conn == "Window", self.edges)
         airboundary = filter(lambda x: x.conn == "Passage", self.edges)
-        return IncomingEdgeGroups(ext, inte, window, airboundary)
+        return DistinguishedEdgeGroups(ext, inte, window, airboundary)
 
 
-# class EdgeGroupModel(BaseModel):
-#     edges: list[tuple[str, str]]
-#     detail: str
-#     type_: EdgeGroupType
-#
-#     @property
-#     def edge_group(self):
-#         edges = map(lambda x: Edge(*x), self.edges)
-#         return EdgeGroup(list(edges), self.detail, self.type_)
-
-
-def read_layout_to_ezcase_rooms(path: Path):
+def read_edges_to_ezcase_edge_groups(path: Path):
     data = read_json(path)
-    geom_plan = GeomPlan.model_validate(data)
-    return geom_plan.ezcase_rooms
+    distinguished_edges = IncomingEgdesModel.model_validate(
+        data
+    ).distinguished_edge_groups
+    return distinguished_edges
 
 
 def make_details():
@@ -108,21 +110,3 @@ def make_details():
         "door": door_detail,
     }
     return detail_map
-
-
-def read_edges_to_ezcase_edges(path: Path):
-    data = read_json(path)
-    edges = MSDEdgesModel.model_validate(data).edges
-
-    def to_edge_group(
-        edge: list[MSDEdgeModel], detail: DETAIL_TYPES, type_: EdgeGroupType
-    ):
-        edges = [Edge(i.a, i.b) for i in edge]
-        return EdgeGroup(edges, detail, type_)
-
-    exterior_door_edges = [i for i in edges if i.conn == "Entrance Door"]
-    interior_door_edges = [i for i in edges if i.conn == "Door"]
-    window_edges = [i for i in edges if i.conn == "Window"]
-    airboundary_edges = [i for i in edges if i.conn == "Passage"]
-
-    return edges
