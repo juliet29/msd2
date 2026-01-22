@@ -1,8 +1,6 @@
 import shapely as sp
 import polars as pl
 from dataframely import DataFrame
-from polymap.geometry.ortho import FancyOrthoDomain
-from polymap.layout.interfaces import Layout
 
 from msd2.geom.interfaces import ConnectionData, RoomData
 from msd2.readin.interfaces import MSDSchema
@@ -58,9 +56,3 @@ def df_unit_to_room_and_connection_data(df: DataFrame[MSDSchema]):
     rooms = make_room_data(MSDSchema.validate(area_df))
     connections = make_connection_data(MSDSchema.validate(connection_df))
     return rooms, connections
-
-
-def df_unit_to_layout(df: DataFrame[MSDSchema]):
-    rooms, connections = df_unit_to_room_and_connection_data(df)
-    doms = map(lambda x: FancyOrthoDomain(x.coords, x.name), rooms)
-    return Layout(list(doms))

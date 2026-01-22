@@ -2,6 +2,7 @@ from typing import Literal, NamedTuple
 from utils4plans.geom import Coord
 from polymap.geometry.ortho import FancyOrthoDomain
 import shapely as sp
+from pydantic import BaseModel
 
 
 ROOM_NAMES = Literal[
@@ -67,3 +68,27 @@ class ConnectionData(NamedTuple):
     @property
     def name(self):
         return f"{self.entity_subtype.lower()}_{self.id}"  # TODO do the names have to be independent? -> maybe have also a type?
+
+
+CONN_TYPES = Literal["Passage", "Door", "Entrance Door", "Window"]
+
+
+class Edge(NamedTuple):
+    a: str
+    b: str  # TODO: should be direction
+    conn: str
+
+
+class ConnectionGroups(NamedTuple):
+    doors: list[ConnectionData]
+    windows: list[ConnectionData]
+
+
+class MSDEdgeModel(BaseModel):
+    a: str
+    b: str
+    conn: str | CONN_TYPES
+
+
+class MSDEdgesModel(BaseModel):
+    edges: list[MSDEdgeModel]
