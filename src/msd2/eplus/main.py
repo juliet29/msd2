@@ -1,14 +1,13 @@
 from pathlib import Path
 
-from replan2eplus.ops.subsurfaces.user_interfaces import EdgeGroup
-from msd2.eplus.interfaces import read_layout_to_ezcase_rooms
+from loguru import logger
+from replan2eplus.ops.subsurfaces.user_interfaces import EdgeGroup, SubsurfaceInputs
+from msd2.eplus.interfaces import make_details, read_layout_to_ezcase_rooms
 from replan2eplus.ezcase.ez import EZ
 from replan2eplus.ops.zones.user_interface import Room
 from msd2.config import WEATHER_FILE
 from msd2.eplus.interfaces import EdgeGroupModel
-from polymap.scripts.preproc import get_case_name
-
-from msd2.eplus.utils import assess_surface_relations
+from polymap.cli.make.utils import get_case_name
 
 
 edge_groups_dict: dict[str, list[EdgeGroupModel]] = {
@@ -23,7 +22,19 @@ edge_groups_dict: dict[str, list[EdgeGroupModel]] = {
             detail="window",
             type_="Zone_Direction",
         ),
-    ]
+    ],
+    "97837": [
+        EdgeGroupModel(
+            edges=[("bedroom_3", "kitchen_0"), ("bathroom_1", "bedroom_2")],
+            detail="door",
+            type_="Zone_Zone",
+        ),
+        EdgeGroupModel(
+            edges=[("bedroom_3", "NORTH"), ("kitchen_0", "SOUTH")],
+            detail="window",
+            type_="Zone_Direction",
+        ),
+    ],
 }
 
 
@@ -33,10 +44,10 @@ def generate_idf(
     case = EZ(output_path=out_path, epw_path=WEATHER_FILE)
     case.add_zones(rooms)
 
-    # subsurface_inputs = SubsurfaceInputs(
-    #     edge_groups, make_details()  # pyright: ignore[reportArgumentType]
-    # )
-    # case.add_subsurfaces(subsurface_inputs)
+    subsurface_inputs = SubsurfaceInputs(
+        edge_groups, make_details()  # pyright: ignore[reportArgumentType]
+    )
+    case.add_subsurfaces(subsurface_inputs)
 
     case.add_constructions()
     case.add_airflow_network()
@@ -50,13 +61,14 @@ def layout_to_idf(path: Path, out_path: Path, run: bool = False):
     rooms = read_layout_to_ezcase_rooms(path)
     case_name = get_case_name(path)
 
-    # if case_name in edge_groups_dict.keys():
-    #     edge_group_models = edge_groups_dict[case_name]
-    #     edge_groups = [i.edge_group for i in edge_group_models]
-    # else:
-    #     edge_groups = []
-    edge_groups = []
+    if case_name in edge_groups_dict.keys():
+        logger.debug(f"Found case name: {case_name}")
+        edge_group_models = edge_groups_dict[case_name]
+        edge_groups = [i.edge_group for i in edge_group_models]
+        logger.debug(f"Adding edge groups {edge_groups}")
+
+    else:
+        edge_groups = []
 
     case = generate_idf(rooms, edge_groups, out_path, run)
-
-    assess_surface_relations(case)
+    return case

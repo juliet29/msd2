@@ -10,6 +10,7 @@ requires-python = ">=3.13"
 dependencies = [
   "cyclopts>=4.4.4",
   "dataframely>=2.1.0",
+  "geomeppy",
   "just>=0.8.165",
   "kagglehub>=0.3.13",
   "loguru>=0.7.3",
@@ -29,7 +30,8 @@ requires = ["uv_build>=0.8.3,<0.9.0"]
 build-backend = "uv_build"
 
 [tool.uv.sources]
-replan2eplus = { path = "../../replan2eplus" }
 svg2plan = { path = "../../svg2plan" }
 utils4plans = { path = "../../utils4plans" }
+geomeppy = { path = "../../geomeppy" }
 polymap = { path = "../../polymap" }
+replan2eplus = { path = "../../replan2eplus" }

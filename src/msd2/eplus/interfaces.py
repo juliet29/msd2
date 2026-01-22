@@ -7,7 +7,7 @@ from replan2eplus.geometry.ortho_domain import OrthoDomain
 from replan2eplus.ops.zones.user_interface import Room
 from utils4plans.io import read_json
 from msd2.config import ROOM_HEIGHT
-from polymap.json_interfaces import LayoutModel
+from polymap.pydantic_models import LayoutModel
 from replan2eplus.ops.subsurfaces.interfaces import Location
 from replan2eplus.ops.subsurfaces.user_interfaces import (
     Detail,

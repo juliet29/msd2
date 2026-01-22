@@ -5,10 +5,22 @@ welcome:
 update-poly:
   uv add /Users/julietnwagwuume-ezeoke/_UILCode/gqe-phd/fpopt/polymap
 
+update-replan:
+  uv add /Users/julietnwagwuume-ezeoke/_UILCode/gqe-phd/fpopt/replan2eplus
+
+update-replan-geomeppy:
+  uv add ~/_UILCode/gqe-phd/fpopt/replan2eplus
+  uv add ~/_UILCode/gqe-phd/fpopt/geomeppy
+update-geomeppy:
+  uv add ~/_UILCode/gqe-phd/fpopt/geomeppy
+
 update-deps:
   uv add /Users/julietnwagwuume-ezeoke/_UILCode/gqe-phd/fpopt/replan2eplus
   uv add /Users/julietnwagwuume-ezeoke/_UILCode/gqe-phd/fpopt/utils4plans
   uv add /Users/julietnwagwuume-ezeoke/_UILCode/gqe-phd/fpopt/polymap
+
+
+
 
 output := 'static/_04_temp/workflow/outputs'
 plan := '97837'
@@ -16,6 +28,11 @@ dir := join(output, plan)
 
 outjson := "out.json"
 outpng:= "out.png"
+
+
+# Utils 
+set-out:
+  set --path msd2out 'static/_04_temp/workflow/outputs'
 
 # Fixing geometry 
 

@@ -3,7 +3,7 @@ from pathlib import Path
 import shapely as sp
 from dataframely import DataFrame
 from polymap.geometry.ortho import FancyOrthoDomain
-from polymap.json_interfaces import layout_to_model
+from polymap.pydantic_models import layout_to_model
 from polymap.layout.interfaces import Layout
 from utils4plans.io import write_json
 
