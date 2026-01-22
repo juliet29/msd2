@@ -6,13 +6,6 @@ from msd2.geom.interfaces import ConnectionData, RoomData
 from msd2.readin.interfaces import MSDSchema
 
 
-# def msd_geom_to_shapely_precise(geom: str) -> sp.Polygon:
-#     spgeo = sp.from_wkt(geom)
-#     spgeo_precise = sp.from_wkt(sp.to_wkt(spgeo, rounding_precision=PRECISION))
-#     assert isinstance(spgeo_precise, sp.Polygon)
-#     return spgeo_precise
-
-
 def msd_geom_to_shapely(geom: str) -> sp.Polygon:
     geo = sp.from_wkt(geom)
     assert isinstance(geo, sp.Polygon)

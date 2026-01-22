@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from loguru import logger
 from polymap.geometry.ortho import FancyOrthoDomain
 from polymap.layout.interfaces import Layout
 from polymap.pydantic_models import layout_to_model
@@ -50,4 +51,4 @@ def sample_unit_ids_to_files_as_layouts(
         write_room_data_to_json_as_layout(rooms, layout_path)
         write_connectivity_edges_to_json(edges, edge_path)
 
-        # logger.info(curr_path)
+        logger.success(f"Finished writing layout and edges to {path /n} ")
