@@ -17,20 +17,18 @@ dependencies = [
   "polymap",
   "ptpython>=3.0.32",
   "replan2eplus",
-  "svg2plan",
   "tabulate>=0.9.0",
   "utils4plans",
 ]
 [project.scripts]
-msd2 = "msd2:main"
-cli = "msd2.cli:main"
+msd = "msd2.cli.main:main"
+msd-studies = "msd2.cli.studies:main"
 
 [build-system]
 requires = ["uv_build>=0.8.3,<0.9.0"]
 build-backend = "uv_build"
 
 [tool.uv.sources]
-svg2plan = { path = "../../svg2plan" }
 utils4plans = { path = "../../utils4plans" }
 geomeppy = { path = "../../geomeppy" }
 polymap = { path = "../../polymap" }

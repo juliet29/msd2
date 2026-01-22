@@ -38,7 +38,9 @@ def sample_unit_ids(num_samples: int = NUM_SAMPLES, seed: int = SEED) -> list[in
     return sorted(sample_ids.tolist())
 
 
-def access_sample_datasets(num_samples: int = NUM_SAMPLES) -> LazyFrame[MSDSchema]:
+def access_sample_datasets_areas_only(
+    num_samples: int = NUM_SAMPLES,
+) -> LazyFrame[MSDSchema]:
     sample_ids = sample_unit_ids(num_samples)
 
     logger.info(f"Sampled IDs: {sample_ids}")
@@ -47,6 +49,14 @@ def access_sample_datasets(num_samples: int = NUM_SAMPLES) -> LazyFrame[MSDSchem
         .pipe(filter_to_areas)
         .filter(pl.col("unit_id").is_in(sample_ids))
     )
+    return MSDSchema.cast(res)
+
+
+def access_sample_datasets(num_samples: int = NUM_SAMPLES) -> LazyFrame[MSDSchema]:
+    sample_ids = sample_unit_ids(num_samples)
+
+    logger.info(f"Sampled IDs: {sample_ids}")
+    res = access_dataset().filter(pl.col("unit_id").is_in(sample_ids))
     return MSDSchema.cast(res)
 
 

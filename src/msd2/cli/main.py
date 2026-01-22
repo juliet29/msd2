@@ -3,7 +3,7 @@ from rich.pretty import pretty_repr
 
 from msd2.config import NUM_SAMPLES
 from msd2.eplus.main import layout_to_idf
-from msd2.geom.utils import sample_unit_ids_to_files
+from msd2.geom.io import sample_unit_ids_to_files_as_layouts
 from utils4plans.logconfig import logset
 
 from msd2.paths import DynamicPaths
@@ -17,7 +17,7 @@ app = App()
 
 @app.command()
 def generate_input_files(num_samples: int = NUM_SAMPLES):
-    sample_unit_ids_to_files(num_samples)
+    sample_unit_ids_to_files_as_layouts(num_samples)
 
 
 # STUDIES

@@ -2,7 +2,7 @@ from polymap.rotate.rotate import rotate_layout
 from polymap.visuals.visuals import plot_layout_comparison
 from math import degrees
 
-from msd2.geom.utils import df_unit_to_layout
+from msd2.geom.create import df_unit_to_layout
 from msd2.readin.access import access_one_sample_dataset
 
 

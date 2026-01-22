@@ -1,5 +1,9 @@
 from msd2.readin.scripts import DatasetSummary
-from msd2.readin.access import access_dataset, access_sample_datasets, sample_unit_ids
+from msd2.readin.access import (
+    access_dataset,
+    access_sample_datasets_areas_only,
+    sample_unit_ids,
+)
 from msd2.readin.filters import (
     all_unit_ids,
     sufficient_areas_unit_ids,
@@ -8,6 +12,7 @@ from msd2.readin.filters import (
 )
 
 
+# TODO: move these to tests
 def test_sample_ids():
     res = sample_unit_ids(10)
     print(res)
@@ -26,6 +31,7 @@ def test_valid_geom_only_unit_ids():
     assert res
 
 
+# TODO: move this to cli -> make?
 def summarize_dataset():
     df = access_dataset()
     summary = list(
@@ -45,5 +51,5 @@ def summarize_dataset():
 
 
 if __name__ == "__main__":
-    df = access_sample_datasets(10)
+    df = access_sample_datasets_areas_only(10)
     print(df.collect())
