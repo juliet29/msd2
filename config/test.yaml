@@ -1,0 +1,8 @@
+pathvars:
+  # input_loc: "static/_04_temp/workflow2/inputs" # TODO change to be sample specific.. # also create a proper test folder
+  input_loc: "static/_04_temp/snakemake/test" # TODO: change polymap to match this
+  output_loc: "static/_04_temp/snakemake/test"
+
+## start and stop
+start_ix: 0
+num_items: 3

@@ -1,4 +1,4 @@
-from msd2.readin.access import sample_unit_ids
+from msd2.readin.access import get_ids_by_indices, sample_unit_ids
 
 
 def test_many_set_interesection():
@@ -13,6 +13,11 @@ def test_sample_ids():
     res = sample_unit_ids(10)
     print(res)
     assert len(res) == 10
+
+
+def test_get_ids_by_indices():
+    res = get_ids_by_indices(1, 3)
+    assert max(res) < 5000
 
 
 if __name__ == "__main__":

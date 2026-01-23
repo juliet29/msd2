@@ -38,6 +38,15 @@ def sample_unit_ids(num_samples: int = NUM_SAMPLES, seed: int = SEED) -> list[in
     return sorted(sample_ids.tolist())
 
 
+def get_ids_by_indices(start_ix: int, num_samples: int):
+    df = pl.read_csv(DynamicPaths.valid_ids_csv).slice(
+        offset=start_ix, length=num_samples
+    )
+    res = df.to_series().cast(pl.Int64).to_list()
+    logger.info(f"Unid IDs in [{start_ix}:{start_ix+num_samples}]: {res}")
+    return res
+
+
 def access_sample_datasets_areas_only(
     num_samples: int = NUM_SAMPLES,
 ) -> LazyFrame[MSDSchema]:
@@ -52,7 +61,9 @@ def access_sample_datasets_areas_only(
     return MSDSchema.cast(res)
 
 
-def access_sample_datasets(num_samples: int = NUM_SAMPLES) -> LazyFrame[MSDSchema]:
+def access_random_sample_datasets(
+    num_samples: int = NUM_SAMPLES,
+) -> LazyFrame[MSDSchema]:
     sample_ids = sample_unit_ids(num_samples)
 
     logger.info(f"Sampled IDs: {sample_ids}")
@@ -60,11 +71,17 @@ def access_sample_datasets(num_samples: int = NUM_SAMPLES) -> LazyFrame[MSDSchem
     return MSDSchema.cast(res)
 
 
+def access_datasets_by_unit_ids(unit_ids: list[float]) -> LazyFrame[MSDSchema]:
+    res = access_dataset().filter(pl.col("unit_id").is_in(unit_ids))
+
+    return MSDSchema.cast(res)
+
+
 def access_one_sample_dataset(
-    sample_id: int | None = None, seed: int = SEED
-) -> tuple[int, LazyFrame[MSDSchema]]:
+    sample_id: float | None = None, seed: int = SEED
+) -> LazyFrame[MSDSchema]:
     if not sample_id:
         sample_id = sample_unit_ids(1, seed=seed)[0]
     print(f"Sampled ID: {sample_id}")
-    res = access_dataset().pipe(filter_to_areas).filter(pl.col("unit_id") == sample_id)
-    return sample_id, MSDSchema.cast(res)
+    res = access_dataset().filter(pl.col("unit_id") == sample_id)
+    return MSDSchema.cast(res)

@@ -1,5 +1,5 @@
 # Custom 
-static/_04_temp/workflow/
+static/_04_temp/snakemake/
 .snakemake/
 
 # Byte-compiled / optimized / DLL files

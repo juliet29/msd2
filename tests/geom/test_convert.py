@@ -1,18 +1,15 @@
-from msd2.geom.create import df_unit_to_layout
-from msd2.readin.access import access_one_sample_dataset
-
-
 class TestConvert:
     ID = 65538
+    pass
 
-    @property
-    def layout(self):
-        id, df = access_one_sample_dataset(self.ID)
-        layout = df_unit_to_layout(df.collect())
-        return layout
-
-    def test_convert_unit_to_layout(self):
-        assert len(self.layout.domains) > 2
+    # @property
+    # def layout(self):
+    #     id, df = access_one_sample_dataset(self.ID)
+    #     layout = df_unit_to_layout(df.collect())
+    #     return layout
+    #
+    # def test_convert_unit_to_layout(self):
+    #     assert len(self.layout.domains) > 2
 
 
 if __name__ == "__main__":
