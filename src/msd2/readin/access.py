@@ -43,7 +43,7 @@ def get_ids_by_indices(start_ix: int, num_samples: int):
         offset=start_ix, length=num_samples
     )
     res = df.to_series().cast(pl.Int64).to_list()
-    logger.info(f"Unid IDs in [{start_ix}:{start_ix+num_samples}]: {res}")
+    logger.info(f"Unit IDs in [{start_ix}:{start_ix+num_samples}]: {res}")
     return res
 
 
