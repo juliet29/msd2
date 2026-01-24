@@ -2665,6 +2665,72 @@ BUILDINGSURFACE:DETAILED,
     -2.145999999716878,       !- Vertex 4 Ycoordinate
     3;                        !- Vertex 4 Zcoordinate
 
+WINDOW,
+    Window__Block `balcony_2` Storey 0 Wall 0001,    !- Name
+    Sgl Clr 6mm,              !- Construction Name
+    Block `balcony_2` Storey 0 Wall 0001,    !- Building Surface Name
+    ,                         !- Frame and Divider Name
+    1,                        !- Multiplier
+    0.3617999999999988,       !- Starting X Coordinate
+    0.75,                     !- Starting Z Coordinate
+    1.0853999999999995,       !- Length
+    1.5;                      !- Height
+
+WINDOW,
+    Window__Block `room_3` Storey 0 Wall 0001,    !- Name
+    Sgl Clr 6mm,              !- Construction Name
+    Block `room_3` Storey 0 Wall 0001,    !- Building Surface Name
+    ,                         !- Frame and Divider Name
+    1,                        !- Multiplier
+    1.0083999999999997,       !- Starting X Coordinate
+    0.75,                     !- Starting Z Coordinate
+    3.0252,                   !- Length
+    1.5;                      !- Height
+
+WINDOW,
+    Window__Block `kitchen_4` Storey 0 Wall 0004,    !- Name
+    Sgl Clr 6mm,              !- Construction Name
+    Block `kitchen_4` Storey 0 Wall 0004,    !- Building Surface Name
+    ,                         !- Frame and Divider Name
+    1,                        !- Multiplier
+    0.5794000000000001,       !- Starting X Coordinate
+    0.75,                     !- Starting Z Coordinate
+    1.7382000000000002,       !- Length
+    1.5;                      !- Height
+
+WINDOW,
+    Window__Block `living_room_5` Storey 0 Wall 0002,    !- Name
+    Sgl Clr 6mm,              !- Construction Name
+    Block `living_room_5` Storey 0 Wall 0002,    !- Building Surface Name
+    ,                         !- Frame and Divider Name
+    1,                        !- Multiplier
+    0.828,                    !- Starting X Coordinate
+    0.75,                     !- Starting Z Coordinate
+    2.4840000000000004,       !- Length
+    1.5;                      !- Height
+
+WINDOW,
+    Window__Block `dining_6` Storey 0 Wall 0003,    !- Name
+    Sgl Clr 6mm,              !- Construction Name
+    Block `dining_6` Storey 0 Wall 0003,    !- Building Surface Name
+    ,                         !- Frame and Divider Name
+    1,                        !- Multiplier
+    0.8605999999999998,       !- Starting X Coordinate
+    0.75,                     !- Starting Z Coordinate
+    2.5818,                   !- Length
+    1.5;                      !- Height
+
+WINDOW,
+    Window__Block `room_9` Storey 0 Wall 0001,    !- Name
+    Sgl Clr 6mm,              !- Construction Name
+    Block `room_9` Storey 0 Wall 0001,    !- Building Surface Name
+    ,                         !- Frame and Divider Name
+    1,                        !- Multiplier
+    0.8167999999999997,       !- Starting X Coordinate
+    0.75,                     !- Starting Z Coordinate
+    2.4503999999999997,       !- Length
+    1.5;                      !- Height
+
 DOOR:INTERZONE,
     Door__Block `corridor_0` Storey 0 Wall 0001_1,    !- Name
     Medium Furnishings,       !- Construction Name
@@ -2774,6 +2840,392 @@ DOOR:INTERZONE,
     ,                         !- Starting Z Coordinate
     1.412999999988824,        !- Length
     2.0999999999999996;       !- Height
+
+AIRFLOWNETWORK:SIMULATIONCONTROL,
+    Default,                  !- Name
+    MultizoneWithoutDistribution,    !- AirflowNetwork Control
+    Input,                    !- Wind Pressure Coefficient Type
+    OpeningHeight,            !- Height Selection for Local Wind Pressure Calculation
+    LowRise,                  !- Building Type
+    500,                      !- Maximum Number of Iterations
+    ZeroNodePressures,        !- Initialization Type
+    0.0001,                   !- Relative Airflow Convergence Tolerance
+    1e-06,                    !- Absolute Airflow Convergence Tolerance
+    -0.5,                     !- Convergence Acceleration Limit
+    0,                        !- Azimuth Angle of Long Axis of Building
+    1,                        !- Ratio of Building Width Along Short Axis to Width Along Long Axis
+    No,                       !- Height Dependence of External Node Temperature
+    SkylineLU,                !- Solver
+    No,                       !- Allow Unsupported Zone Equipment
+    No;                       !- Do Distribution Duct Sizing Calculation
+
+AIRFLOWNETWORK:MULTIZONE:ZONE,
+    Block `room_3` Storey 0,    !- Zone Name
+    Constant,                 !- Ventilation Control Mode
+    ,                         !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    0,                        !- Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+    100,                      !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+    300000,                   !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+    ,                         !- Venting Availability Schedule Name
+    Standard,                 !- Single Sided Wind Pressure Coefficient Algorithm
+    10;                       !- Facade Width
+
+AIRFLOWNETWORK:MULTIZONE:ZONE,
+    Block `balcony_2` Storey 0,    !- Zone Name
+    Constant,                 !- Ventilation Control Mode
+    ,                         !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    0,                        !- Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+    100,                      !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+    300000,                   !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+    ,                         !- Venting Availability Schedule Name
+    Standard,                 !- Single Sided Wind Pressure Coefficient Algorithm
+    10;                       !- Facade Width
+
+AIRFLOWNETWORK:MULTIZONE:ZONE,
+    Block `room_9` Storey 0,    !- Zone Name
+    Constant,                 !- Ventilation Control Mode
+    ,                         !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    0,                        !- Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+    100,                      !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+    300000,                   !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+    ,                         !- Venting Availability Schedule Name
+    Standard,                 !- Single Sided Wind Pressure Coefficient Algorithm
+    10;                       !- Facade Width
+
+AIRFLOWNETWORK:MULTIZONE:ZONE,
+    Block `corridor_7` Storey 0,    !- Zone Name
+    Constant,                 !- Ventilation Control Mode
+    ,                         !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    0,                        !- Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+    100,                      !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+    300000,                   !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+    ,                         !- Venting Availability Schedule Name
+    Standard,                 !- Single Sided Wind Pressure Coefficient Algorithm
+    10;                       !- Facade Width
+
+AIRFLOWNETWORK:MULTIZONE:SURFACE,
+    Window__Block `room_3` Storey 0 Wall 0001,    !- Surface Name
+    SimpleOpening__Window__Block `room_3` Storey 0 Wall 0001,    !- Leakage Component Name
+    AFN_External_Node_SOUTH_room_3,    !- External Node Name
+    1,                        !- WindowDoor Opening Factor or Crack Factor
+    Constant,                 !- Ventilation Control Mode
+    ,                         !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    0,                        !- Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+    100,                      !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+    300000,                   !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+    ,                         !- Venting Availability Schedule Name
+    ,                         !- Occupant Ventilation Control Name
+    PolygonHeight,            !- Equivalent Rectangle Method
+    1;                        !- Equivalent Rectangle Aspect Ratio
+
+AIRFLOWNETWORK:MULTIZONE:SURFACE,
+    Door__Block `room_3` Storey 0 Wall 0002_2,    !- Surface Name
+    SimpleOpening__Door__Block `room_3` Storey 0 Wall 0002_2,    !- Leakage Component Name
+    ,                         !- External Node Name
+    1,                        !- WindowDoor Opening Factor or Crack Factor
+    Constant,                 !- Ventilation Control Mode
+    ,                         !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    0,                        !- Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+    100,                      !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+    300000,                   !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+    ,                         !- Venting Availability Schedule Name
+    ,                         !- Occupant Ventilation Control Name
+    PolygonHeight,            !- Equivalent Rectangle Method
+    1;                        !- Equivalent Rectangle Aspect Ratio
+
+AIRFLOWNETWORK:MULTIZONE:SURFACE,
+    Window__Block `balcony_2` Storey 0 Wall 0001,    !- Surface Name
+    SimpleOpening__Window__Block `balcony_2` Storey 0 Wall 0001,    !- Leakage Component Name
+    AFN_External_Node_SOUTH_balcony_2,    !- External Node Name
+    1,                        !- WindowDoor Opening Factor or Crack Factor
+    Constant,                 !- Ventilation Control Mode
+    ,                         !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    0,                        !- Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+    100,                      !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+    300000,                   !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+    ,                         !- Venting Availability Schedule Name
+    ,                         !- Occupant Ventilation Control Name
+    PolygonHeight,            !- Equivalent Rectangle Method
+    1;                        !- Equivalent Rectangle Aspect Ratio
+
+AIRFLOWNETWORK:MULTIZONE:SURFACE,
+    Door__Block `balcony_2` Storey 0 Wall 0006_1,    !- Surface Name
+    SimpleOpening__Door__Block `balcony_2` Storey 0 Wall 0006_1,    !- Leakage Component Name
+    ,                         !- External Node Name
+    1,                        !- WindowDoor Opening Factor or Crack Factor
+    Constant,                 !- Ventilation Control Mode
+    ,                         !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    0,                        !- Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+    100,                      !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+    300000,                   !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+    ,                         !- Venting Availability Schedule Name
+    ,                         !- Occupant Ventilation Control Name
+    PolygonHeight,            !- Equivalent Rectangle Method
+    1;                        !- Equivalent Rectangle Aspect Ratio
+
+AIRFLOWNETWORK:MULTIZONE:SURFACE,
+    Window__Block `room_9` Storey 0 Wall 0001,    !- Surface Name
+    SimpleOpening__Window__Block `room_9` Storey 0 Wall 0001,    !- Leakage Component Name
+    AFN_External_Node_SOUTH_room_9,    !- External Node Name
+    1,                        !- WindowDoor Opening Factor or Crack Factor
+    Constant,                 !- Ventilation Control Mode
+    ,                         !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    0,                        !- Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+    100,                      !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+    300000,                   !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+    ,                         !- Venting Availability Schedule Name
+    ,                         !- Occupant Ventilation Control Name
+    PolygonHeight,            !- Equivalent Rectangle Method
+    1;                        !- Equivalent Rectangle Aspect Ratio
+
+AIRFLOWNETWORK:MULTIZONE:SURFACE,
+    Door__Block `room_9` Storey 0 Wall 0004_2,    !- Surface Name
+    SimpleOpening__Door__Block `room_9` Storey 0 Wall 0004_2,    !- Leakage Component Name
+    ,                         !- External Node Name
+    1,                        !- WindowDoor Opening Factor or Crack Factor
+    Constant,                 !- Ventilation Control Mode
+    ,                         !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    0,                        !- Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+    100,                      !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+    300000,                   !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+    ,                         !- Venting Availability Schedule Name
+    ,                         !- Occupant Ventilation Control Name
+    PolygonHeight,            !- Equivalent Rectangle Method
+    1;                        !- Equivalent Rectangle Aspect Ratio
+
+AIRFLOWNETWORK:MULTIZONE:SURFACE,
+    Door__Block `room_9` Storey 0 Wall 0002_1,    !- Surface Name
+    SimpleOpening__Door__Block `room_9` Storey 0 Wall 0002_1,    !- Leakage Component Name
+    ,                         !- External Node Name
+    1,                        !- WindowDoor Opening Factor or Crack Factor
+    Constant,                 !- Ventilation Control Mode
+    ,                         !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    0,                        !- Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+    100,                      !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+    300000,                   !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+    ,                         !- Venting Availability Schedule Name
+    ,                         !- Occupant Ventilation Control Name
+    PolygonHeight,            !- Equivalent Rectangle Method
+    1;                        !- Equivalent Rectangle Aspect Ratio
+
+AIRFLOWNETWORK:MULTIZONE:SURFACE,
+    Door__Block `corridor_7` Storey 0 Wall 0004_1,    !- Surface Name
+    SimpleOpening__Door__Block `corridor_7` Storey 0 Wall 0004_1,    !- Leakage Component Name
+    ,                         !- External Node Name
+    1,                        !- WindowDoor Opening Factor or Crack Factor
+    Constant,                 !- Ventilation Control Mode
+    ,                         !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    0,                        !- Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+    100,                      !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+    300000,                   !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+    ,                         !- Venting Availability Schedule Name
+    ,                         !- Occupant Ventilation Control Name
+    PolygonHeight,            !- Equivalent Rectangle Method
+    1;                        !- Equivalent Rectangle Aspect Ratio
+
+AIRFLOWNETWORK:MULTIZONE:SURFACE,
+    Door__Block `corridor_7` Storey 0 Wall 0002_1,    !- Surface Name
+    SimpleOpening__Door__Block `corridor_7` Storey 0 Wall 0002_1,    !- Leakage Component Name
+    ,                         !- External Node Name
+    1,                        !- WindowDoor Opening Factor or Crack Factor
+    Constant,                 !- Ventilation Control Mode
+    ,                         !- Ventilation Control Zone Temperature Setpoint Schedule Name
+    0,                        !- Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
+    100,                      !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor
+    0,                        !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
+    300000,                   !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor
+    ,                         !- Venting Availability Schedule Name
+    ,                         !- Occupant Ventilation Control Name
+    PolygonHeight,            !- Equivalent Rectangle Method
+    1;                        !- Equivalent Rectangle Aspect Ratio
+
+AIRFLOWNETWORK:MULTIZONE:COMPONENT:SIMPLEOPENING,
+    SimpleOpening__Window__Block `room_3` Storey 0 Wall 0001,    !- Name
+    0.001,                    !- Air Mass Flow Coefficient When Opening is Closed
+    0.65,                     !- Air Mass Flow Exponent When Opening is Closed
+    0.0001,                   !- Minimum Density Difference for TwoWay Flow
+    1;                        !- Discharge Coefficient
+
+AIRFLOWNETWORK:MULTIZONE:COMPONENT:SIMPLEOPENING,
+    SimpleOpening__Door__Block `room_3` Storey 0 Wall 0002_2,    !- Name
+    0.001,                    !- Air Mass Flow Coefficient When Opening is Closed
+    0.65,                     !- Air Mass Flow Exponent When Opening is Closed
+    0.0001,                   !- Minimum Density Difference for TwoWay Flow
+    1;                        !- Discharge Coefficient
+
+AIRFLOWNETWORK:MULTIZONE:COMPONENT:SIMPLEOPENING,
+    SimpleOpening__Window__Block `balcony_2` Storey 0 Wall 0001,    !- Name
+    0.001,                    !- Air Mass Flow Coefficient When Opening is Closed
+    0.65,                     !- Air Mass Flow Exponent When Opening is Closed
+    0.0001,                   !- Minimum Density Difference for TwoWay Flow
+    1;                        !- Discharge Coefficient
+
+AIRFLOWNETWORK:MULTIZONE:COMPONENT:SIMPLEOPENING,
+    SimpleOpening__Door__Block `balcony_2` Storey 0 Wall 0006_1,    !- Name
+    0.001,                    !- Air Mass Flow Coefficient When Opening is Closed
+    0.65,                     !- Air Mass Flow Exponent When Opening is Closed
+    0.0001,                   !- Minimum Density Difference for TwoWay Flow
+    1;                        !- Discharge Coefficient
+
+AIRFLOWNETWORK:MULTIZONE:COMPONENT:SIMPLEOPENING,
+    SimpleOpening__Window__Block `room_9` Storey 0 Wall 0001,    !- Name
+    0.001,                    !- Air Mass Flow Coefficient When Opening is Closed
+    0.65,                     !- Air Mass Flow Exponent When Opening is Closed
+    0.0001,                   !- Minimum Density Difference for TwoWay Flow
+    1;                        !- Discharge Coefficient
+
+AIRFLOWNETWORK:MULTIZONE:COMPONENT:SIMPLEOPENING,
+    SimpleOpening__Door__Block `room_9` Storey 0 Wall 0004_2,    !- Name
+    0.001,                    !- Air Mass Flow Coefficient When Opening is Closed
+    0.65,                     !- Air Mass Flow Exponent When Opening is Closed
+    0.0001,                   !- Minimum Density Difference for TwoWay Flow
+    1;                        !- Discharge Coefficient
+
+AIRFLOWNETWORK:MULTIZONE:COMPONENT:SIMPLEOPENING,
+    SimpleOpening__Door__Block `room_9` Storey 0 Wall 0002_1,    !- Name
+    0.001,                    !- Air Mass Flow Coefficient When Opening is Closed
+    0.65,                     !- Air Mass Flow Exponent When Opening is Closed
+    0.0001,                   !- Minimum Density Difference for TwoWay Flow
+    1;                        !- Discharge Coefficient
+
+AIRFLOWNETWORK:MULTIZONE:COMPONENT:SIMPLEOPENING,
+    SimpleOpening__Door__Block `corridor_7` Storey 0 Wall 0004_1,    !- Name
+    0.001,                    !- Air Mass Flow Coefficient When Opening is Closed
+    0.65,                     !- Air Mass Flow Exponent When Opening is Closed
+    0.0001,                   !- Minimum Density Difference for TwoWay Flow
+    1;                        !- Discharge Coefficient
+
+AIRFLOWNETWORK:MULTIZONE:COMPONENT:SIMPLEOPENING,
+    SimpleOpening__Door__Block `corridor_7` Storey 0 Wall 0002_1,    !- Name
+    0.001,                    !- Air Mass Flow Coefficient When Opening is Closed
+    0.65,                     !- Air Mass Flow Exponent When Opening is Closed
+    0.0001,                   !- Minimum Density Difference for TwoWay Flow
+    1;                        !- Discharge Coefficient
+
+AIRFLOWNETWORK:MULTIZONE:EXTERNALNODE,
+    AFN_External_Node_SOUTH_room_3,    !- Name
+    0,                        !- External Node Height
+    AFN_Pressure_Coefficient_Values_SOUTH,    !- Wind Pressure Coefficient Curve Name
+    No,                       !- Symmetric Wind Pressure Coefficient Curve
+    Absolute;                 !- Wind Angle Type
+
+AIRFLOWNETWORK:MULTIZONE:EXTERNALNODE,
+    AFN_External_Node_SOUTH_balcony_2,    !- Name
+    0,                        !- External Node Height
+    AFN_Pressure_Coefficient_Values_SOUTH,    !- Wind Pressure Coefficient Curve Name
+    No,                       !- Symmetric Wind Pressure Coefficient Curve
+    Absolute;                 !- Wind Angle Type
+
+AIRFLOWNETWORK:MULTIZONE:EXTERNALNODE,
+    AFN_External_Node_SOUTH_room_9,    !- Name
+    0,                        !- External Node Height
+    AFN_Pressure_Coefficient_Values_SOUTH,    !- Wind Pressure Coefficient Curve Name
+    No,                       !- Symmetric Wind Pressure Coefficient Curve
+    Absolute;                 !- Wind Angle Type
+
+AIRFLOWNETWORK:MULTIZONE:WINDPRESSURECOEFFICIENTARRAY,
+    AFN_Wind_Directions_0,    !- Name
+    0,                        !- Wind Direction 1
+    30,                       !- Wind Direction 2
+    60,                       !- Wind Direction 3
+    90,                       !- Wind Direction 4
+    120,                      !- Wind Direction 5
+    150,                      !- Wind Direction 6
+    180,                      !- Wind Direction 7
+    210,                      !- Wind Direction 8
+    240,                      !- Wind Direction 9
+    270,                      !- Wind Direction 10
+    300,                      !- Wind Direction 11
+    330;                      !- Wind Direction 12
+
+AIRFLOWNETWORK:MULTIZONE:WINDPRESSURECOEFFICIENTVALUES,
+    AFN_Pressure_Coefficient_Values_NORTH,    !- Name
+    AFN_Wind_Directions_0,    !- AirflowNetworkMultiZoneWindPressureCoefficientArray Name
+    0.6,                      !- Wind Pressure Coefficient Value 1
+    0.48,                     !- Wind Pressure Coefficient Value 2
+    0.04,                     !- Wind Pressure Coefficient Value 3
+    -0.56,                    !- Wind Pressure Coefficient Value 4
+    -0.56,                    !- Wind Pressure Coefficient Value 5
+    -0.42,                    !- Wind Pressure Coefficient Value 6
+    -0.37,                    !- Wind Pressure Coefficient Value 7
+    -0.42,                    !- Wind Pressure Coefficient Value 8
+    -0.56,                    !- Wind Pressure Coefficient Value 9
+    -0.56,                    !- Wind Pressure Coefficient Value 10
+    0.04,                     !- Wind Pressure Coefficient Value 11
+    0.48;                     !- Wind Pressure Coefficient Value 12
+
+AIRFLOWNETWORK:MULTIZONE:WINDPRESSURECOEFFICIENTVALUES,
+    AFN_Pressure_Coefficient_Values_SOUTH,    !- Name
+    AFN_Wind_Directions_0,    !- AirflowNetworkMultiZoneWindPressureCoefficientArray Name
+    -0.37,                    !- Wind Pressure Coefficient Value 1
+    -0.42,                    !- Wind Pressure Coefficient Value 2
+    -0.56,                    !- Wind Pressure Coefficient Value 3
+    -0.56,                    !- Wind Pressure Coefficient Value 4
+    0.04,                     !- Wind Pressure Coefficient Value 5
+    0.48,                     !- Wind Pressure Coefficient Value 6
+    0.6,                      !- Wind Pressure Coefficient Value 7
+    0.48,                     !- Wind Pressure Coefficient Value 8
+    0.04,                     !- Wind Pressure Coefficient Value 9
+    -0.56,                    !- Wind Pressure Coefficient Value 10
+    -0.56,                    !- Wind Pressure Coefficient Value 11
+    -0.42;                    !- Wind Pressure Coefficient Value 12
+
+AIRFLOWNETWORK:MULTIZONE:WINDPRESSURECOEFFICIENTVALUES,
+    AFN_Pressure_Coefficient_Values_EAST,    !- Name
+    AFN_Wind_Directions_0,    !- AirflowNetworkMultiZoneWindPressureCoefficientArray Name
+    -0.56,                    !- Wind Pressure Coefficient Value 1
+    0.04,                     !- Wind Pressure Coefficient Value 2
+    0.48,                     !- Wind Pressure Coefficient Value 3
+    0.6,                      !- Wind Pressure Coefficient Value 4
+    0.48,                     !- Wind Pressure Coefficient Value 5
+    0.04,                     !- Wind Pressure Coefficient Value 6
+    -0.56,                    !- Wind Pressure Coefficient Value 7
+    -0.56,                    !- Wind Pressure Coefficient Value 8
+    -0.42,                    !- Wind Pressure Coefficient Value 9
+    -0.37,                    !- Wind Pressure Coefficient Value 10
+    -0.42,                    !- Wind Pressure Coefficient Value 11
+    -0.56;                    !- Wind Pressure Coefficient Value 12
+
+AIRFLOWNETWORK:MULTIZONE:WINDPRESSURECOEFFICIENTVALUES,
+    AFN_Pressure_Coefficient_Values_WEST,    !- Name
+    AFN_Wind_Directions_0,    !- AirflowNetworkMultiZoneWindPressureCoefficientArray Name
+    -0.56,                    !- Wind Pressure Coefficient Value 1
+    -0.56,                    !- Wind Pressure Coefficient Value 2
+    -0.42,                    !- Wind Pressure Coefficient Value 3
+    -0.37,                    !- Wind Pressure Coefficient Value 4
+    -0.42,                    !- Wind Pressure Coefficient Value 5
+    -0.56,                    !- Wind Pressure Coefficient Value 6
+    -0.56,                    !- Wind Pressure Coefficient Value 7
+    0.04,                     !- Wind Pressure Coefficient Value 8
+    0.48,                     !- Wind Pressure Coefficient Value 9
+    0.6,                      !- Wind Pressure Coefficient Value 10
+    0.48,                     !- Wind Pressure Coefficient Value 11
+    0.04;                     !- Wind Pressure Coefficient Value 12
 
 OUTPUT:VARIABLE,
     *,                        !- Key Value
