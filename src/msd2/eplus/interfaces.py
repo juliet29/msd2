@@ -72,6 +72,10 @@ class DistinguishedEdgeGroups(NamedTuple):
             self.airboundary, "door", "Zone_Zone"
         )  # TODO: this might be a special type
 
+    @property
+    def simple_edges(self):
+        return [self.interior_door_edges, self.window_edges]
+
 
 class IncomingEgdesModel(MSDEdgesModel):
     @property

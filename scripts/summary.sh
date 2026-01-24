@@ -1,6 +1,6 @@
 #!/bin/bash
-cd /Users/julietnwagwuume-ezeoke/_UILCode/gqe-phd/fpopt/studies2/msd2/static/_04_temp/workflow/outputs
-echo "Summary of MSD2 outputs"
+cd "/Users/julietnwagwuume-ezeoke/_UILCode/gqe-phd/fpopt/studies2/msd2/static/_04_temp/snakemake/$1"
+echo "Summary of MSD2 outputs in $1"
 
 echo "Total:" && ls | wc -l
 

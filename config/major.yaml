@@ -1,3 +1,0 @@
-pathvars:
-  input_loc: "static/_04_temp/snakemake/major/outputs"
-  output_loc: "static/_04_temp/snakemake/major/outputs"

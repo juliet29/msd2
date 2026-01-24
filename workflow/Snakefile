@@ -1,6 +1,7 @@
+include: "rules/common.smk"
 include: "rules/polymap.smk"
 include: "rules/msd.smk"
-include: "rules/common.smk"
+include: "rules/eplus.smk"
 
 
 rule hello:

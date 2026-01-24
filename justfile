@@ -66,8 +66,8 @@ find-ortho-only:
 show-ortho-only:
   ./scripts/ortho_only.sh | xargs -I {} kitty icat {}/rotate/out.png
 
-summarize:
-  ./scripts/summary.sh
+summarize folder:
+  ./scripts/summary.sh {{folder}}
 
 
 

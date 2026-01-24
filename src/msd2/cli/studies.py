@@ -3,7 +3,7 @@ from cyclopts import App
 from rich.pretty import pretty_repr
 from utils4plans.logconfig import logset
 
-from msd2.edges.graph import extract_connectivity_graph
+from msd2.geom.connectivity import extract_connectivity_graph
 from msd2.geom.create import df_unit_to_room_and_connection_data
 from msd2.readin.access import access_random_sample_datasets
 

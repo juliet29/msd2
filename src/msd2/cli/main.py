@@ -7,7 +7,6 @@ from msd2.eplus.main import layout_to_idf
 from msd2.geom.io import write_unit
 from utils4plans.logconfig import logset
 
-from msd2.paths import DynamicPaths
 from loguru import logger
 
 from msd2.readin.access import get_ids_by_indices
@@ -38,12 +37,9 @@ def generate(unit_id: float, edge_path: Path, layout_path: Path):
 
 
 @app.command()
-def create_idf(case_name: str, run: bool = False):
+def create_idf(edge_path: Path, layout_path: Path, outpath: Path):
     # this is part of snakemake ..
-    folder_path = DynamicPaths.workflow_outputs / case_name
-    inpath = folder_path / "ymove/out.json"
-    outpath = folder_path / "model"
-    case = layout_to_idf(inpath, outpath, run)
+    case = layout_to_idf(edge_path, layout_path, outpath)
 
     # assess_surface_relations(case)
 
@@ -51,7 +47,7 @@ def create_idf(case_name: str, run: bool = False):
 
 
 def main():
-    logset()
+    logset(to_stderr=True)
     app()
 
 
