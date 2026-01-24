@@ -15,15 +15,11 @@ from msd2.eplus.interfaces import (
 )
 from replan2eplus.ezcase.ez import EZ
 from replan2eplus.ops.zones.user_interface import Room
-from msd2.config import WEATHER_FILE
+from msd2.config import ANALYSIS_PERIOD, WEATHER_FILE
 from replan2eplus.ops.subsurfaces.logic.select import get_zones_by_plan_name
 
 
 def handle_windows(case: EZ, windows_edge_group: EdgeGroup):
-    assert windows_edge_group.type_ == "Zone_Direction"
-
-    seen_zones = Counter()
-
     def create(edge: Edge):
         zone_a = get_zones_by_plan_name(edge.space_a, case.objects.zones)
         seen_zones[zone_a.zone_name] += 1
@@ -45,6 +41,9 @@ def handle_windows(case: EZ, windows_edge_group: EdgeGroup):
         new_edge = Edge(edge.space_a, drn.name)
         return new_edge
 
+    assert windows_edge_group.type_ == "Zone_Direction"
+
+    seen_zones = Counter()
     new_edges = [create(e) for e in windows_edge_group.edges]
     new_group = EdgeGroup(
         new_edges, windows_edge_group.detail, windows_edge_group.type_
@@ -104,3 +103,14 @@ def layout_to_idf(edge_path: Path, layout_path: Path, outpath: Path):
 
     case = generate_idf(rooms, egs, outpath.parent, run=False)
     return case
+
+
+def idf_to_results(idf_path: Path, output_directory: Path):
+    case = EZ(idf_path, read_existing=False)
+    case.save_and_run(
+        output_path=output_directory.parent,
+        epw_path=WEATHER_FILE,
+        analysis_period=ANALYSIS_PERIOD,
+        run=True,
+        save=False,
+    )

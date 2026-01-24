@@ -1,6 +1,8 @@
 # Custom 
 static/_04_temp/snakemake/
+static/_03_models/
 .snakemake/
+**/.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

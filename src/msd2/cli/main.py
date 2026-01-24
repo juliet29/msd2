@@ -3,7 +3,7 @@ from cyclopts import App
 from rich.pretty import pretty_repr
 
 from msd2.cli.setup import setup_app
-from msd2.eplus.main import layout_to_idf
+from msd2.eplus.main import layout_to_idf, idf_to_results
 from msd2.geom.io import write_unit
 from utils4plans.logconfig import logset
 
@@ -38,12 +38,13 @@ def generate(unit_id: float, edge_path: Path, layout_path: Path):
 
 @app.command()
 def create_idf(edge_path: Path, layout_path: Path, outpath: Path):
-    # this is part of snakemake ..
     case = layout_to_idf(edge_path, layout_path, outpath)
-
-    # assess_surface_relations(case)
-
     logger.debug(pretty_repr(case.objects.subsurfaces))
+
+
+@app.command()
+def run_idf(idf_path: Path, results_path: Path):
+    idf_to_results(idf_path, results_path)
 
 
 def main():
