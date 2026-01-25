@@ -2,6 +2,7 @@ from pathlib import Path
 from cyclopts import App
 from rich.pretty import pretty_repr
 
+from msd2.analysis.qois import calc_metrics
 from msd2.cli.setup import setup_app
 from msd2.eplus.main import layout_to_idf, idf_to_results
 from msd2.geom.io import write_unit
@@ -45,6 +46,11 @@ def create_idf(edge_path: Path, layout_path: Path, outpath: Path):
 @app.command()
 def run_idf(idf_path: Path, results_path: Path):
     idf_to_results(idf_path, results_path)
+
+
+@app.command()
+def create_metrics(idf_path: Path, sql_path: Path, outpath: Path):
+    calc_metrics(idf_path, sql_path.parent.parent, outpath)
 
 
 def main():

@@ -74,3 +74,6 @@ summarize folder:
 # Running Eplus models 
 create-idf case run:
   uv run cli create-idf {{case}} {{run}}
+
+
+# Testing out metric calcs .. 

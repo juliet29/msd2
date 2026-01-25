@@ -1,6 +1,5 @@
 from pathlib import Path 
 
-include: "common.smk"
 configfile: "config/test.yaml"
 
 
