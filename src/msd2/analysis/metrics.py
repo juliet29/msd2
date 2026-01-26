@@ -115,7 +115,6 @@ def make_summary_dataset(paths: list[Path]):
 
     def tod_df(tod: TimeOfDay):
         dfs = [tod_qoi_dataset(casedata, qoi, tod) for qoi in qois]
-        logger.debug(dfs)
         res = join_dfs(dfs)
         logger.debug(res)
         return res

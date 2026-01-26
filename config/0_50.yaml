@@ -3,6 +3,7 @@ pathvars:
   output_loc: "static/_04_temp/snakemake/0_50" # TODO change to match others..
 
   models_loc: "static/_03_models/snakemake/0_50"
+  results_loc: "static/_05_figures/snakemake/0_50"
 ## start and stop
 start_ix: 0
 num_items: 50

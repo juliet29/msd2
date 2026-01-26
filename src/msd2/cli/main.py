@@ -3,6 +3,8 @@ from cyclopts import App
 from rich.pretty import pretty_repr
 
 from msd2.analysis.data import collect_data
+from msd2.analysis.design_metrics import handle_design_metrics
+from msd2.analysis.metrics import make_summary_dataset
 from msd2.cli.setup import setup_app
 from msd2.eplus.main import layout_to_idf, idf_to_results
 from msd2.eplus.metrics import calc_plan_metrics_from_path
@@ -59,6 +61,19 @@ def create_data(idf_path: Path, sql_path: Path, outpath: Path):
 def create_metrics(idf_path: Path, outpath: Path):
     df = calc_plan_metrics_from_path(idf_path)
     df.write_csv(outpath)
+
+
+@app.command()
+def create_summary_data(paths: list[Path], daypath: Path, nightpath: Path):
+    day, night = make_summary_dataset(paths)
+    day.write_csv(daypath)
+    night.write_csv(nightpath)
+
+
+@app.command()
+def create_summary_metrics(paths: list[Path], outpath: Path):
+    res = handle_design_metrics(paths)
+    res.write_csv(outpath)
 
 
 def main():

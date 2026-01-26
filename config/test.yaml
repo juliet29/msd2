@@ -3,6 +3,7 @@ pathvars:
   input_loc: "static/_04_temp/snakemake/test" # TODO: change polymap to match this
   output_loc: "static/_04_temp/snakemake/test"
   models_loc: "static/_03_models/snakemake/test"
+  results_loc: "static/_05_figures/snakemake/test"
 
 ## start and stop
 start_ix: 0
