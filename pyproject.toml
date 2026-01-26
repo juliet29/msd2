@@ -14,6 +14,7 @@ dependencies = [
   "just>=0.8.165",
   "kagglehub>=0.3.13",
   "loguru>=0.7.3",
+  "patito>=0.8.5",
   "polymap",
   "ptpython>=3.0.32",
   "replan2eplus",

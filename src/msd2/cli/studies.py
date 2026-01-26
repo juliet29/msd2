@@ -1,10 +1,17 @@
-from pathlib import Path
 from cyclopts import App
 
 from rich.pretty import pretty_repr
 from utils4plans.logconfig import logset
 
-from msd2.analysis.qois import calc_metrics
+from msd2.analysis.data import QOIRegistry, collect_data
+from msd2.analysis.design_metrics import handle_design_metrics
+from msd2.analysis.metrics import (
+    handle_data,
+    make_summary_dataset,
+    plot_tod_qoi_dataset,
+    set_altair_render,
+)
+from msd2.eplus.metrics import calc_plan_metrics_from_path
 from msd2.geom.connectivity import extract_connectivity_graph
 from msd2.geom.create import df_unit_to_room_and_connection_data
 from msd2.paths import static_paths
@@ -13,8 +20,6 @@ from msd2.readin.access import access_random_sample_datasets
 from loguru import logger
 
 from msd2.readin.interfaces import MSDSchema
-
-import tempfile
 
 
 studies_app = App()
@@ -35,13 +40,60 @@ def try_edges():
 
 
 @studies_app.command()
-def create_metrics(case: str):
+def create_data(case: str):
     path = static_paths.models / "snakemake" / "0_50" / case
     idf_path = path / "run.idf"
     sql_path = path
-    with tempfile.TemporaryDirectory() as tmpdir:
-        p = Path(tmpdir) / "out.csv"
-        calc_metrics(idf_path, sql_path, p)
+    res = collect_data(idf_path, sql_path)
+    logger.debug(res)
+    return res
+
+
+@studies_app.command()
+def create_metrics(case: str):
+    path = static_paths.models / "snakemake" / "0_50" / case
+    idf_path = path / "run.idf"
+    res = calc_plan_metrics_from_path(idf_path)
+    logger.debug(res)
+    return res
+
+
+def get_filtered_paths(filename: str):
+    path = static_paths.models / "snakemake" / "0_50"
+    paths = [i for i in path.iterdir() if i.is_dir()]
+    data_paths = [p / filename for p in paths]
+    filtered_paths = [i for i in data_paths if i.exists()]
+    return filtered_paths
+
+
+@studies_app.command()
+def try_bar_plot():
+    casedata = handle_data(get_filtered_paths("analysis/data.nc"))
+
+    res, chart = plot_tod_qoi_dataset(casedata, QOIRegistry.net_flow, "Day")
+    # logger.debug(res)
+
+    set_altair_render("browser")
+    chart.show()
+
+    return res
+
+
+@studies_app.command()
+def try_summary_data():
+
+    # casedata = handle_data(get_filtered_paths("analysis/data.nc"))
+    # res = tod_qoi_dataset(casedata, QOIRegistry.net_flow, "Day")
+    # logger.debug(res)
+
+    day, night = make_summary_dataset(get_filtered_paths("analysis/data.nc"))
+    logger.debug(day)
+
+
+@studies_app.command()
+def try_read_metrics():
+    df = handle_design_metrics(get_filtered_paths("analysis/metrics.csv"))
+    return df
 
 
 def main():

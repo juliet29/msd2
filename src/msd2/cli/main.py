@@ -2,9 +2,10 @@ from pathlib import Path
 from cyclopts import App
 from rich.pretty import pretty_repr
 
-from msd2.analysis.qois import calc_metrics
+from msd2.analysis.data import collect_data
 from msd2.cli.setup import setup_app
 from msd2.eplus.main import layout_to_idf, idf_to_results
+from msd2.eplus.metrics import calc_plan_metrics_from_path
 from msd2.geom.io import write_unit
 from utils4plans.logconfig import logset
 
@@ -49,8 +50,15 @@ def run_idf(idf_path: Path, results_path: Path):
 
 
 @app.command()
-def create_metrics(idf_path: Path, sql_path: Path, outpath: Path):
-    calc_metrics(idf_path, sql_path.parent.parent, outpath)
+def create_data(idf_path: Path, sql_path: Path, outpath: Path):
+    dataset = collect_data(idf_path, sql_path.parent.parent)
+    dataset.to_netcdf(outpath)
+
+
+@app.command()
+def create_metrics(idf_path: Path, outpath: Path):
+    df = calc_plan_metrics_from_path(idf_path)
+    df.write_csv(outpath)
 
 
 def main():
