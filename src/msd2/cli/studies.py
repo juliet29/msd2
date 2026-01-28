@@ -1,5 +1,7 @@
+## NOTE: These should be temoporary -> regularly move out to tests!
 from cyclopts import App
 
+from replan2eplus.ezcase.ez import EZ
 from rich.pretty import pretty_repr
 from utils4plans.logconfig import logset
 
@@ -11,18 +13,26 @@ from msd2.analysis.metrics import (
     plot_tod_qoi_dataset,
     set_altair_render,
 )
+from msd2.analysis.plots import make_corr_plot
 from msd2.eplus.metrics import calc_plan_metrics_from_path
 from msd2.geom.connectivity import extract_connectivity_graph
 from msd2.geom.create import df_unit_to_room_and_connection_data
+from msd2.graph_analysis.main import make_graph
 from msd2.paths import static_paths
 from msd2.readin.access import access_random_sample_datasets
 
 from loguru import logger
 
 from msd2.readin.interfaces import MSDSchema
+from msd2.readin.scripts import summarize_dataset
 
 
 studies_app = App()
+
+
+@studies_app.command()
+def show_summarize_dataset():
+    summarize_dataset()
 
 
 @studies_app.command()
@@ -80,20 +90,38 @@ def try_bar_plot():
 
 
 @studies_app.command()
+def try_read_metrics():
+    df = handle_design_metrics(get_filtered_paths("analysis/metrics.csv"))
+    return df
+
+
+@studies_app.command()
 def try_summary_data():
-
-    # casedata = handle_data(get_filtered_paths("analysis/data.nc"))
-    # res = tod_qoi_dataset(casedata, QOIRegistry.net_flow, "Day")
-    # logger.debug(res)
-
     day, night = make_summary_dataset(get_filtered_paths("analysis/data.nc"))
     logger.debug(day)
 
 
 @studies_app.command()
-def try_read_metrics():
-    df = handle_design_metrics(get_filtered_paths("analysis/metrics.csv"))
-    return df
+def try_corr_plot():
+    root = static_paths.figures / "snakemake/0_50"
+    csvname = "out.csv"
+    data = root / "data/day" / csvname
+    metric = root / "metrics" / csvname
+    charts = make_corr_plot(data, metric)
+
+    set_altair_render("browser")
+    for chart in charts:
+        chart.show()
+
+
+@studies_app.command()
+def try_make_graph(casenum: str):  # 6289
+    path = static_paths.models / "snakemake" / "0_50" / casenum
+    idf_path = path / "run.idf"
+    case = EZ(idf_path=idf_path)
+    g = make_graph(case)
+    logger.debug(g)
+    logger.debug(pretty_repr([i for i in g.nodes(data=True)]))
 
 
 def main():

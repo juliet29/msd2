@@ -1,6 +1,7 @@
 from typing import NamedTuple
 import polars as pl
 from rich import print
+from rich.pretty import pretty_repr
 from tabulate import tabulate
 from msd2.paths import DynamicPaths
 from msd2.readin.filters import (
@@ -45,7 +46,7 @@ def get_id_list():
 def summarize_dataset():
     id_list = get_id_list()
     ds = DatasetSummary(*[len(i) for i in id_list])
-    logger.info(ds)
+    logger.info(pretty_repr(ds))
     return ds
 
 

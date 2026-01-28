@@ -1134,6 +1134,7 @@ dependencies = [
     { name = "ptpython" },
     { name = "replan2eplus" },
     { name = "tabulate" },
+    { name = "types-networkx" },
     { name = "utils4plans" },
 ]
 
@@ -1150,6 +1151,7 @@ requires-dist = [
     { name = "ptpython", specifier = ">=3.0.32" },
     { name = "replan2eplus", directory = "../../replan2eplus" },
     { name = "tabulate", specifier = ">=0.9.0" },
+    { name = "types-networkx", specifier = ">=3.6.0.20251127" },
     { name = "utils4plans", directory = "../../utils4plans" },
 ]
 
