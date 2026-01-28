@@ -119,9 +119,20 @@ def try_make_graph(casenum: str):  # 6289
     path = static_paths.models / "snakemake" / "0_50" / casenum
     idf_path = path / "run.idf"
     case = EZ(idf_path=idf_path)
+    # logger.debug(
+    #     pretty_repr(
+    #         [(i.room_name, i.zone_name) for i in case.objects.airflow_network.zones]
+    #     )
+    # )
+    # logger.debug(
+    #     pretty_repr(
+    #         [(i.name, i.edge) for i in case.objects.airflow_network.afn_surfaces]
+    #     )
+    # )
     g = make_graph(case)
     logger.debug(g)
     logger.debug(pretty_repr([i for i in g.nodes(data=True)]))
+    logger.debug(pretty_repr([i for i in g.edges(data=True)]))
 
 
 def main():

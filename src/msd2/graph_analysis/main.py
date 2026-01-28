@@ -1,4 +1,5 @@
 from typing import Literal, NamedTuple
+from replan2eplus.geometry.coords import Coord
 from replan2eplus.ezcase.objects import Subsurface
 from replan2eplus.geometry.directions import WallNormal
 from replan2eplus.ops.afn.ezobject import Airboundary
@@ -22,6 +23,7 @@ def calculate_domain_aspect_ratio(
 
 class AFNNodeData(NamedTuple):
     type_: Literal["zone", "external_node"]
+    location: Coord
     # just for internal nodes
     area: float | None = None
     aspect_ratio: float | None = None
@@ -34,19 +36,39 @@ class AFNNode(NamedTuple):
     name: str
     data: AFNNodeData
 
+    @property
+    def entry(self):
+        return (self.name, {"data": self.data})
+
 
 class AFNEdgeData(NamedTuple):
     net_flow_rate: xr.DataArray  # as  function of time..
 
 
-# class AFNEdge(NamedTuple):
-#     name: str
-#     data: AFNEdgeData
+class AFNEdge(NamedTuple):
+    u: str
+    v: str
+    data: AFNEdgeData
+
+    @property
+    def entry(self):
+        return (self.u, self.v, {"data": self.data})
 
 
 class AFNGraph(nx.Graph):
-    def add_afn_node(self, node: AFNNode):
-        self.add_node(node.name, data=node.data)
+    def add_afn_nodes(self, nodes: list[AFNNode]):
+        self.add_nodes_from([i.entry for i in nodes])
+
+    def add_afn_edges(self, edges: list[AFNEdge]):
+        self.add_edges_from([i.entry for i in edges])
+
+    # TODO: control how nodes are taken
+    def get_nodes(self, data: bool = False):
+        if data:
+            # TODO: prevent additions of the wrong type..
+            return [AFNNode(i, data=data["data"]) for i, data in self.nodes(data=True)]
+        else:
+            return [i for i in self.nodes]
 
     # def add_node(  # pyright: ignore[reportIncompatibleMethodOverride]
     #     self, node_for_adding: str, data: AFNNode, **attr: Any
@@ -70,20 +92,25 @@ def make_graph(case: EZ):
     def make_afn_node_from_zone(zone: Zone):
         domain = zone.domain
         return AFNNode(
-            zone.zone_name,
+            zone.room_name,
             data=AFNNodeData(
-                "zone", domain.area, calculate_domain_aspect_ratio(domain)
+                "zone",
+                domain.centroid,
+                domain.area,
+                calculate_domain_aspect_ratio(domain),
             ),
         )
 
-    def make_edge_node_from_zone(afn_surface: Subsurface | Airboundary):
-        # afn_surface.name
-        pass
+    def make_edge(afn_surface: Subsurface | Airboundary):
+        e = afn_surface.edge
+        return AFNEdge(e.space_a, e.space_b, data=AFNEdgeData(xr.DataArray()))
 
     G = AFNGraph()
     zone_nodes = [make_afn_node_from_zone(i) for i in afn_zones]
-    for z in zone_nodes:
-        G.add_afn_node(z)
+    G.add_afn_nodes(zone_nodes)
+
+    edge_nodes = [make_edge(i) for i in afn_surfaces]
+    G.add_afn_edges(edge_nodes)
 
     #
     #
