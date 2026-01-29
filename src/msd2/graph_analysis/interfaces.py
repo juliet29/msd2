@@ -1,8 +1,9 @@
 from typing import Literal, NamedTuple
+
 import networkx as nx
+import xarray as xr
 from replan2eplus.geometry.coords import Coord
 from replan2eplus.geometry.directions import WallNormal
-import xarray as xr
 
 
 class AFNNodeData(NamedTuple):
@@ -56,3 +57,17 @@ class AFNGraph(nx.Graph):
             return [AFNNode(i, data=data["data"]) for i, data in self.nodes(data=True)]
         else:
             return [i for i in self.nodes]
+
+    @property
+    def external_nodes(self):
+        nodes = self.get_nodes(data=True)
+        return [i for i in nodes if i.data.type_ == "external_node"]
+
+    @property
+    def zone_nodes(self):
+        nodes = self.get_nodes(data=True)
+        return [i for i in nodes if i.data.type_ == "zone"]
+
+
+def make_layout(nodes: list[AFNNode]):
+    return {node.name: list(node.data.location.as_tuple) for node in nodes}

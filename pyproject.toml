@@ -11,6 +11,7 @@ dependencies = [
   "cyclopts>=4.4.4",
   "dataframely>=2.1.0",
   "geomeppy",
+  "iplotx>=1.6.0",
   "just>=0.8.165",
   "kagglehub>=0.3.13",
   "loguru>=0.7.3",

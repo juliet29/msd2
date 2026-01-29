@@ -734,6 +734,20 @@ wheels = [
 ]
 
 [[package]]
+name = "iplotx"
+version = "1.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "pandas" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e7/4c/6a61c49516978b28ff2cfe2785d5ce7c8a4333cad160aff1ac9dd733c1aa/iplotx-1.6.0.tar.gz", hash = "sha256:e4ad3ef952da5c3450c1dc863f3625b12dcaf4ba5d9949797971ca9d4c7e096b", size = 1966650, upload-time = "2025-11-24T05:58:08.794Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/57/b4/7a812ebf870a02928157145c01128c70941c25fe13d706ef32cd60001350/iplotx-1.6.0-py3-none-any.whl", hash = "sha256:6ed3587a8775b7d559611d80d305fc63979daf0dec92ca93170b7f5603d0d457", size = 100349, upload-time = "2025-11-24T05:58:07.223Z" },
+]
+
+[[package]]
 name = "jedi"
 version = "0.19.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1126,6 +1140,7 @@ dependencies = [
     { name = "cyclopts" },
     { name = "dataframely" },
     { name = "geomeppy" },
+    { name = "iplotx" },
     { name = "just" },
     { name = "kagglehub" },
     { name = "loguru" },
@@ -1143,6 +1158,7 @@ requires-dist = [
     { name = "cyclopts", specifier = ">=4.4.4" },
     { name = "dataframely", specifier = ">=2.1.0" },
     { name = "geomeppy", directory = "../../geomeppy" },
+    { name = "iplotx", specifier = ">=1.6.0" },
     { name = "just", specifier = ">=0.8.165" },
     { name = "kagglehub", specifier = ">=0.3.13" },
     { name = "loguru", specifier = ">=0.7.3" },

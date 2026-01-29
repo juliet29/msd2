@@ -16,3 +16,4 @@ class DynamicPaths:
     weather_pa2024 = (
         BASE_PATH / "../../../weather_data" / "CA_PALO-ALTO-AP_724937S_20.epw"
     )
+    temp = static_paths.temp / "temp"

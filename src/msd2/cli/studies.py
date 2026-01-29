@@ -1,8 +1,8 @@
 ## NOTE: These should be temoporary -> regularly move out to tests!
 from cyclopts import App
 
-from replan2eplus.ezcase.ez import EZ
 from rich.pretty import pretty_repr
+from utils4plans.io import write_pickle, read_pickle
 from utils4plans.logconfig import logset
 
 from msd2.analysis.data import QOIRegistry, collect_data
@@ -18,7 +18,8 @@ from msd2.eplus.metrics import calc_plan_metrics_from_path
 from msd2.geom.connectivity import extract_connectivity_graph
 from msd2.geom.create import df_unit_to_room_and_connection_data
 from msd2.graph_analysis.main import make_graph
-from msd2.paths import static_paths
+from msd2.graph_analysis.viz import viz_graph
+from msd2.paths import DynamicPaths, static_paths
 from msd2.readin.access import access_random_sample_datasets
 
 from loguru import logger
@@ -115,46 +116,30 @@ def try_corr_plot():
 
 
 @studies_app.command()
-def try_make_graph(casenum: str):  # 6289
+def make_test_graph(casenum: str = "6289"):  # 6289
     path = static_paths.models / "snakemake" / "0_50" / casenum
     idf_path = path / "run.idf"
 
-    case = EZ(idf_path=idf_path)
-    # external_node = "AIRFLOWNETWORK:MULTIZONE:EXTERNALNODE"
-    # nodes = case.idf.idfobjects[external_node]
-    # nodes = IDFAFNExternalNode.read_and_filter(case.idf)
-    # observed_curves = [i.Wind_Pressure_Coefficient_Curve_Name for i in nodes]
-
-    # logger.debug(nodes)
-    # logger.debug(observed_curves)
-    # res = handle_external_nodes(observed_curves)
-    # logger.debug(res)
-    # cardinal_locations = calculate_cardinal_points(
-    #     calculate_cardinal_domain([i.domain for i in case.objects.zones])
-    # )
-    # logger.debug(cardinal_locations["EAST"])
-
-    # logger.debug(nodes)
-    # qoi = get_qoi("AFN Node Wind Pressure", path)
-    # qoi1 = get_qoi("AFN Zone Mixing Volume", path)
-    # logger.debug(qoi.data_arr)
-    # logger.debug(qoi.data_arr.space_names)
-
-    # logger.debug(qoi.space_names)  # TODO: fix doesnt work anymore
-    # logger.debug(
-    #     pretty_repr(
-    #         [(i.room_name, i.zone_name) for i in case.objects.airflow_network.zones]
-    #     )
-    # )
-    # logger.debug(
-    #     pretty_repr(
-    #         [(i.name, i.edge) for i in case.objects.airflow_network.afn_surfaces]
-    #     )
-    # )
     g = make_graph(idf_path, path)
+    write_pickle(g, DynamicPaths.temp, "test_graph")
+
+
+@studies_app.command()
+def show_graph():  # 6289
+    g = read_pickle(DynamicPaths.temp, "test_graph")
     logger.debug(g)
     logger.debug(pretty_repr([i for i in g.nodes(data=True)]))
     logger.debug(pretty_repr([i for i in g.edges(data=True)]))
+
+
+@studies_app.command()
+def try_make_graph():  # 6289
+    g = read_pickle(DynamicPaths.temp, "test_graph")
+    logger.debug(g)
+    viz_graph(g)
+    # logger.debug(g)
+    # logger.debug(pretty_repr([i for i in g.nodes(data=True)]))
+    # logger.debug(pretty_repr([i for i in g.edges(data=True)]))
 
 
 def main():
