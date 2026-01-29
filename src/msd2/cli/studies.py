@@ -118,7 +118,29 @@ def try_corr_plot():
 def try_make_graph(casenum: str):  # 6289
     path = static_paths.models / "snakemake" / "0_50" / casenum
     idf_path = path / "run.idf"
+
     case = EZ(idf_path=idf_path)
+    # external_node = "AIRFLOWNETWORK:MULTIZONE:EXTERNALNODE"
+    # nodes = case.idf.idfobjects[external_node]
+    # nodes = IDFAFNExternalNode.read_and_filter(case.idf)
+    # observed_curves = [i.Wind_Pressure_Coefficient_Curve_Name for i in nodes]
+
+    # logger.debug(nodes)
+    # logger.debug(observed_curves)
+    # res = handle_external_nodes(observed_curves)
+    # logger.debug(res)
+    # cardinal_locations = calculate_cardinal_points(
+    #     calculate_cardinal_domain([i.domain for i in case.objects.zones])
+    # )
+    # logger.debug(cardinal_locations["EAST"])
+
+    # logger.debug(nodes)
+    # qoi = get_qoi("AFN Node Wind Pressure", path)
+    # qoi1 = get_qoi("AFN Zone Mixing Volume", path)
+    # logger.debug(qoi.data_arr)
+    # logger.debug(qoi.data_arr.space_names)
+
+    # logger.debug(qoi.space_names)  # TODO: fix doesnt work anymore
     # logger.debug(
     #     pretty_repr(
     #         [(i.room_name, i.zone_name) for i in case.objects.airflow_network.zones]
@@ -129,7 +151,7 @@ def try_make_graph(casenum: str):  # 6289
     #         [(i.name, i.edge) for i in case.objects.airflow_network.afn_surfaces]
     #     )
     # )
-    g = make_graph(case)
+    g = make_graph(idf_path, path)
     logger.debug(g)
     logger.debug(pretty_repr([i for i in g.nodes(data=True)]))
     logger.debug(pretty_repr([i for i in g.edges(data=True)]))

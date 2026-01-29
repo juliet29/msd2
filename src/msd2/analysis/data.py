@@ -26,6 +26,7 @@ class QOI(NamedTuple):
     def update_xarray(self, arr: xr.DataArray):
         arr.name = self.name
         arr.attrs["units"] = self.unit
+        # TODO would be good to relate to the info that Ladybug gives..
 
 
 class QOIRegistry:
@@ -40,14 +41,19 @@ def get_afn_zone_names(path: Path):
     return afn_zone_names
 
 
-def calc_space_averaged_net_flow_rate(path: Path):
+# TODO move to calccs... probably related to registry?
+def calc_net_flow(path: Path):
     f12: OutputVariables = "AFN Linkage Node 1 to Node 2 Volume Flow Rate"
     f21: OutputVariables = "AFN Linkage Node 2 to Node 1 Volume Flow Rate"
 
     f12_arr = get_qoi(f12, path).data_arr
     f21_arr = get_qoi(f21, path).data_arr
+    arr = abs(f12_arr - f21_arr)
+    return arr
 
-    arr = (abs(f12_arr - f21_arr)).mean(dim="space_names")
+
+def calc_space_averaged_net_flow_rate(path: Path):
+    arr = calc_net_flow(path).mean(dim="space_names")
     QOIRegistry.net_flow.update_xarray(arr)
 
     return arr
