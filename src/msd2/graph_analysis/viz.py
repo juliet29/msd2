@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 
 from sklearn.preprocessing import minmax_scale
-from astropy.visualization import LogStretch, AsinhStretch
+from astropy.visualization import AsinhStretch, SqrtStretch
 import networkx as nx
 import iplotx as ipx
 
@@ -22,7 +22,7 @@ def make_datetime(
 
 def norm_size(data: list[float], scale: int = 50):
     t01 = minmax_scale(data, (0, 1))
-    stretch_fx = LogStretch()
+    stretch_fx = SqrtStretch()
     norm_data = stretch_fx(t01) * scale
     return norm_data
 
@@ -43,12 +43,15 @@ def select_time(arr: xr.DataArray, dt: datetime = make_datetime()):
 def viz_graph(G: AFNGraph, scale: int = 40):
     fig, ax = plt.subplots()
 
-    nodedata = [select_time(i.data.ach) for i in G.zone_nodes]
+    nodedata = [
+        select_time(i.data.mix_volume + i.data.vent_volume) for i in G.zone_nodes
+    ]
     logger.debug(nodedata)
     norm_data = norm_size(nodedata, scale)
     logger.debug(norm_data)
 
     edgedata = [select_time(i.data.net_flow_rate) for i in G.edges_with_data]
+    display_edgedata = [rf"${i:.2f}$" for i in edgedata]
     logger.debug(edgedata)
     norm_edge = norm_edge_fx(edgedata)
     logger.debug(norm_edge)
@@ -56,7 +59,7 @@ def viz_graph(G: AFNGraph, scale: int = 40):
     node_only_subgraph = nx.Graph()
     node_only_subgraph.add_nodes_from(G.zone_names)
 
-    label_style = {"bbox": {"facecolor": "orange"}}
+    bbox_style = {"bbox": {"facecolor": "#01245c"}}
 
     edge_colors = edgedata
     cmap = plt.cm.Blues
@@ -66,12 +69,18 @@ def viz_graph(G: AFNGraph, scale: int = 40):
         G,
         ax=ax,
         layout=G.layout,
+        edge_labels=display_edgedata,
         style={
             "edge": {
                 "linewidth": norm_edge,
                 "color": edge_colors,
                 "cmap": cmap,
-            }
+                "label": {"bbox": {"facecolor": "#4f5661"}},
+            },
+            "vertex": {
+                "marker": "o",
+                "facecolor": "white",  # hide nodes at this point..
+            },
         },
     )
     # zones and size
@@ -84,7 +93,7 @@ def viz_graph(G: AFNGraph, scale: int = 40):
             "vertex": {
                 "marker": "o",
                 "size": norm_data,
-                "facecolor": "blue",
+                "facecolor": "#6d83a6",
             }
         },
     )
@@ -100,7 +109,7 @@ def viz_graph(G: AFNGraph, scale: int = 40):
                 "marker": "o",
                 "size": scale,
                 "facecolor": "gray",
-                "label": label_style,
+                "label": bbox_style,
             }
         },
     )
