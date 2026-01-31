@@ -16,10 +16,12 @@ from replan2eplus.visuals.domains import calculate_cardinal_domain
 from msd2.analysis.data import calc_net_flow
 from msd2.graph_analysis.interfaces import (
     AFNEdge,
-    AFNNode,
     AFNEdgeData,
     AFNGraph,
-    AFNNodeData,
+    ZoneNodeData,
+    ExternalNodeData,
+    ZoneNode,
+    ExternalNode,
 )
 
 
@@ -33,7 +35,7 @@ def calculate_domain_aspect_ratio(
     )
 
 
-class ExternalNode(NamedTuple):
+class IDFExternalNode(NamedTuple):
     name: str
     direction: str
 
@@ -45,7 +47,7 @@ def handle_external_nodes(nodes: list[str]):
         res = pattern.search(node)
         if res:
             drn = res.group()
-            return ExternalNode(node, drn)
+            return IDFExternalNode(node, drn)
         else:
             raise ValueError(f"{node} does not contain a direction!")
 
@@ -67,17 +69,17 @@ def get_space_arr(arr: xr.DataArray, name: str):
     try:
         return arr.sel(space_names=name.upper())
     except KeyError:
-        return None
+        raise Exception(f"Could not find data for {name} in {arr}")
 
 
 def make_graph(idf_path: Path, sql_path: Path):
-    def make_afn_nodes_from_external_nodes(extnode: ExternalNode):
+    def make_afn_nodes_from_external_nodes(extnode: IDFExternalNode):
         cardinal_locations = calculate_cardinal_points(
             calculate_cardinal_domain([i.domain for i in afn_zones])
         )
-        return AFNNode(
+        return ExternalNode(
             extnode.direction,
-            data=AFNNodeData(
+            data=ExternalNodeData(
                 type_="external_node",
                 location=cardinal_locations[
                     extnode.direction
@@ -89,9 +91,9 @@ def make_graph(idf_path: Path, sql_path: Path):
     def make_afn_node_from_zone(zone: Zone):
         domain = zone.domain
         zone_name = zone.zone_name
-        return AFNNode(
+        return ZoneNode(
             zone.room_name,
-            data=AFNNodeData(
+            data=ZoneNodeData(
                 type_="zone",
                 location=domain.centroid,
                 area=domain.area,

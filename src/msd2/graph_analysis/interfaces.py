@@ -1,36 +1,53 @@
-from typing import Literal, NamedTuple
+from typing import Hashable, Literal, NamedTuple, Sequence, TypeVar
+from dataclasses import dataclass
 
 import networkx as nx
 import xarray as xr
 from replan2eplus.geometry.coords import Coord
-from replan2eplus.geometry.directions import WallNormal
+
+NodeType = Literal["zone", "external_node"]
 
 
-class AFNNodeData(NamedTuple):
-    type_: Literal["zone", "external_node"]
+class ZoneNodeData(NamedTuple):
+    type_: NodeType
     location: Coord
-    # just for internal nodes
-    area: float | None = None
-    aspect_ratio: float | None = None
-    vent_volume: xr.DataArray | None = None
-    mix_volume: xr.DataArray | None = None
-    ach: xr.DataArray | None = None
-    # just for external nodes
-    external_wind_pressure: xr.DataArray | None = None  # as  function of time..
-    facade: WallNormal | None = None
+    area: float
+    aspect_ratio: float
+    vent_volume: xr.DataArray
+    mix_volume: xr.DataArray
+    ach: xr.DataArray
 
 
-class AFNNode(NamedTuple):
+class ExternalNodeData(NamedTuple):
+    type_: NodeType
+    location: Coord
+    external_wind_pressure: xr.DataArray
+
+
+@dataclass(frozen=True)
+class AFNNode:
     name: str
-    data: AFNNodeData
+    data: ExternalNodeData | ZoneNodeData
 
     @property
     def entry(self):
         return (self.name, {"data": self.data})
 
 
+@dataclass(frozen=True)
+class ZoneNode(AFNNode):
+    name: str
+    data: ZoneNodeData
+
+
+@dataclass(frozen=True)
+class ExternalNode(AFNNode):
+    name: str
+    data: ExternalNodeData
+
+
 class AFNEdgeData(NamedTuple):
-    net_flow_rate: xr.DataArray | None = None  # as  function of time..
+    net_flow_rate: xr.DataArray
 
 
 class AFNEdge(NamedTuple):
@@ -43,31 +60,57 @@ class AFNEdge(NamedTuple):
         return (self.u, self.v, {"data": self.data})
 
 
+AFNNodeType = TypeVar("AFNNodeType", bound=AFNNode)
+
+
 class AFNGraph(nx.Graph):
-    def add_afn_nodes(self, nodes: list[AFNNode]):
+    def add_afn_nodes(self, nodes: list[AFNNodeType]):
         self.add_nodes_from([i.entry for i in nodes])
 
     def add_afn_edges(self, edges: list[AFNEdge]):
         self.add_edges_from([i.entry for i in edges])
 
-    # TODO: control how nodes are taken
-    def get_nodes(self, data: bool = False):
-        if data:
-            # TODO: prevent additions of the wrong type..
-            return [AFNNode(i, data=data["data"]) for i, data in self.nodes(data=True)]
-        else:
-            return [i for i in self.nodes]
-
     @property
-    def external_nodes(self):
-        nodes = self.get_nodes(data=True)
-        return [i for i in nodes if i.data.type_ == "external_node"]
+    def edges_with_data(self):
+        edges = [AFNEdge(u, v, data["data"]) for u, v, data in self.edges(data=True)]
+        return edges
 
     @property
     def zone_nodes(self):
-        nodes = self.get_nodes(data=True)
-        return [i for i in nodes if i.data.type_ == "zone"]
+        nodes = self.nodes(data=True)
+        res = [
+            ZoneNode(i, data["data"])
+            for i, data in nodes
+            if isinstance(data["data"], ZoneNodeData)
+        ]
+        return res
 
+    @property
+    def external_nodes(self) -> list[ExternalNode]:
+        nodes = self.nodes(data=True)
+        res = [
+            ExternalNode(i, data["data"])
+            for i, data in nodes
+            if isinstance(data["data"], ExternalNodeData)
+        ]
+        return res
 
-def make_layout(nodes: list[AFNNode]):
-    return {node.name: list(node.data.location.as_tuple) for node in nodes}
+    @property
+    def zone_names(self):
+        return [i.name for i in self.zone_nodes]
+
+    @property
+    def external_node_names(self):
+        return [i.name for i in self.external_nodes]
+
+    @property
+    def all_names(self):
+        return self.nodes(data=False)
+
+    @property
+    def all_nodes(self):
+        return self.zone_nodes + self.external_nodes
+
+    @property
+    def layout(self) -> dict[Hashable, tuple[float, float] | Sequence[float]]:
+        return {node.name: list(node.data.location.as_tuple) for node in self.all_nodes}

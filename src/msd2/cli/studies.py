@@ -121,7 +121,7 @@ def make_test_graph(casenum: str = "6289"):  # 6289
     idf_path = path / "run.idf"
 
     g = make_graph(idf_path, path)
-    write_pickle(g, DynamicPaths.temp, "test_graph")
+    write_pickle(g, DynamicPaths.temp, "test_graph", OVERWRITE=True)
 
 
 @studies_app.command()

@@ -1,8 +1,12 @@
 from loguru import logger
-from msd2.graph_analysis.interfaces import AFNGraph, make_layout
+from msd2.graph_analysis.interfaces import AFNGraph
 import xarray as xr
 import matplotlib.pyplot as plt
 from datetime import datetime
+
+from sklearn.preprocessing import minmax_scale
+from astropy.visualization import LogStretch, AsinhStretch
+import networkx as nx
 import iplotx as ipx
 
 
@@ -16,27 +20,92 @@ def make_datetime(
     return datetime(year, month, day, hour, minute)
 
 
+def norm_size(data: list[float], scale: int = 50):
+    t01 = minmax_scale(data, (0, 1))
+    stretch_fx = LogStretch()
+    norm_data = stretch_fx(t01) * scale
+    return norm_data
+
+
+def norm_edge_fx(data: list[float], scale: int = 10):
+    t01 = minmax_scale(data, (0.1, 1))
+    logger.debug(t01)
+    stretch_fx = AsinhStretch()
+    norm_data = stretch_fx(t01) * scale
+    return norm_data
+
+
 def select_time(arr: xr.DataArray, dt: datetime = make_datetime()):
-    return arr.sel(datetimes=dt).data
+    # TODO: use xarray validation to ensure this actually works..
+    return float(arr.sel(datetimes=dt).data)
 
 
-def viz_graph(G: AFNGraph):
+def viz_graph(G: AFNGraph, scale: int = 40):
     fig, ax = plt.subplots()
-    layout = make_layout(G.get_nodes(data=True))
 
-    # first focus on zones  -> get the data and then make subgraph
-    nodedata = [
-        select_time(i.data.ach) if i.data.ach.any() else 0 for i in G.zone_nodes
-    ]
+    nodedata = [select_time(i.data.ach) for i in G.zone_nodes]
     logger.debug(nodedata)
+    norm_data = norm_size(nodedata, scale)
+    logger.debug(norm_data)
 
-    nodesizes = nodedata
-    #
-    artist = ipx.network(
-        G.subgraph([i.name for i in G.zone_nodes]),
+    edgedata = [select_time(i.data.net_flow_rate) for i in G.edges_with_data]
+    logger.debug(edgedata)
+    norm_edge = norm_edge_fx(edgedata)
+    logger.debug(norm_edge)
+
+    node_only_subgraph = nx.Graph()
+    node_only_subgraph.add_nodes_from(G.zone_names)
+
+    label_style = {"bbox": {"facecolor": "orange"}}
+
+    edge_colors = edgedata
+    cmap = plt.cm.Blues
+
+    # edges
+    network_artist = ipx.network(
+        G,
         ax=ax,
-        layout=layout,
-        vertex_labels=G.zone_nodes,
-        style={"vertex": {"marker": "r", "size": nodesizes}},
+        layout=G.layout,
+        style={
+            "edge": {
+                "linewidth": norm_edge,
+                "color": edge_colors,
+                "cmap": cmap,
+            }
+        },
+    )
+    # zones and size
+    ipx.network(
+        node_only_subgraph,
+        ax=ax,
+        layout=G.layout,
+        # vertex_labels=G.zone_names,
+        style={
+            "vertex": {
+                "marker": "o",
+                "size": norm_data,
+                "facecolor": "blue",
+            }
+        },
+    )
+
+    ipx.network(
+        G.subgraph(G.external_node_names),
+        ax=ax,
+        layout=G.layout,
+        vertex_labels=G.external_node_names,
+        fontsize="xx-small",
+        style={
+            "vertex": {
+                "marker": "o",
+                "size": scale,
+                "facecolor": "gray",
+                "label": label_style,
+            }
+        },
+    )
+    fig.colorbar(
+        network_artist[0].get_edges(),
+        ax=ax,
     )
     plt.show()

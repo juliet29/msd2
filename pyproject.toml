@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+  "astropy>=7.2.0",
   "cyclopts>=4.4.4",
   "dataframely>=2.1.0",
   "geomeppy",
@@ -19,6 +20,7 @@ dependencies = [
   "polymap",
   "ptpython>=3.0.32",
   "replan2eplus",
+  "scikit-learn>=1.8.0",
   "tabulate>=0.9.0",
   "types-networkx>=3.6.0.20251127",
   "utils4plans",
