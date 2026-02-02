@@ -60,6 +60,11 @@ class AFNEdge(NamedTuple):
         return (self.u, self.v, {"data": self.data})
 
 
+class BasicEdge(NamedTuple):
+    u: str
+    v: str
+
+
 AFNNodeType = TypeVar("AFNNodeType", bound=AFNNode)
 
 
@@ -114,3 +119,20 @@ class AFNGraph(nx.Graph):
     @property
     def layout(self) -> dict[Hashable, tuple[float, float] | Sequence[float]]:
         return {node.name: list(node.data.location.as_tuple) for node in self.all_nodes}
+
+    def make_time_specific_digraph(self, data: list[float]):
+        # NOTE: this is a bit risky, becasue not sure the egdes and the the data have the same alignment... maybe should take in a list of the edges also.., but its a property, so should only be calculated once, then cached...
+        def make_edge(edge: BasicEdge, datapt: float):
+            if abs(datapt) > 0:
+                return (edge.u, edge.v)
+            else:
+                return (edge.v, edge.u)
+
+        G = nx.DiGraph()
+        edges = [
+            make_edge(BasicEdge(i.u, i.v), datapt)
+            for i, datapt in zip(self.edges_with_data, data)
+        ]
+
+        G.add_edges_from([i for i in edges])
+        return G

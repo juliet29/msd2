@@ -52,6 +52,8 @@ def viz_graph(G: AFNGraph, scale: int = 40):
 
     edgedata = [select_time(i.data.net_flow_rate) for i in G.edges_with_data]
     display_edgedata = [rf"${i:.2f}$" for i in edgedata]
+    edge_graph_at_time = G.make_time_specific_digraph(edgedata)
+
     logger.debug(edgedata)
     norm_edge = norm_edge_fx(edgedata)
     logger.debug(norm_edge)
@@ -62,11 +64,11 @@ def viz_graph(G: AFNGraph, scale: int = 40):
     bbox_style = {"bbox": {"facecolor": "#01245c"}}
 
     edge_colors = edgedata
-    cmap = plt.cm.Blues
+    cmap = plt.cm.Blues  # pyright: ignore[reportAttributeAccessIssue]
 
     # edges
     network_artist = ipx.network(
-        G,
+        edge_graph_at_time,
         ax=ax,
         layout=G.layout,
         edge_labels=display_edgedata,
