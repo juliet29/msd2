@@ -1,9 +1,9 @@
 from pathlib import Path
 
 from loguru import logger
-from polymap.geometry.ortho import FancyOrthoDomain
-from polymap.layout.interfaces import Layout
-from polymap.pydantic_models import layout_to_model
+from polyfix.geometry.ortho import FancyOrthoDomain
+from polyfix.layout.interfaces import Layout
+from polyfix.pydantic_models import layout_to_model
 from utils4plans.io import write_json
 
 from msd2.geom.connectivity import Edge, extract_connectivity_graph

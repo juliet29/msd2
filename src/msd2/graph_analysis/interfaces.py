@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import networkx as nx
 import xarray as xr
-from replan2eplus.geometry.coords import Coord
+from plan2eplus.geometry.coords import Coord
 
 NodeType = Literal["zone", "external_node"]
 
@@ -119,6 +119,18 @@ class AFNGraph(nx.Graph):
     @property
     def layout(self) -> dict[Hashable, tuple[float, float] | Sequence[float]]:
         return {node.name: list(node.data.location.as_tuple) for node in self.all_nodes}
+
+    @property
+    def zone_only_subgraph(self):
+        sg = nx.Graph()
+        sg.add_nodes_from(self.zone_names)
+        return sg
+
+    @property
+    def external_node_only_subgraph(self):
+        sg = nx.Graph()
+        sg.add_nodes_from(self.external_node_names)
+        return sg
 
     def make_time_specific_digraph(self, data: list[float]):
         # NOTE: this is a bit risky, becasue not sure the egdes and the the data have the same alignment... maybe should take in a list of the edges also.., but its a property, so should only be calculated once, then cached...

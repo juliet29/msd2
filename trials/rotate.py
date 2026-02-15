@@ -1,5 +1,5 @@
-from polymap.rotate.rotate import rotate_layout
-from polymap.visuals.visuals import plot_layout_comparison
+from polyfix.rotate.rotate import rotate_layout
+from polyfix.visuals.visuals import plot_layout_comparison
 from math import degrees
 
 from msd2.geom.create import df_unit_to_layout

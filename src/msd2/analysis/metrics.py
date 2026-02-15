@@ -3,7 +3,7 @@ from functools import reduce
 from loguru import logger
 import polars as pl
 import xarray as xr
-from polymap.cli.make.utils import get_case_name
+from polyfix.cli.make.utils import get_case_name
 from typing import Literal
 import altair as alt
 from msd2.analysis.data import QOI, QOIRegistry

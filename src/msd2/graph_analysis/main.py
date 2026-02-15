@@ -1,18 +1,21 @@
 import re
-from replan2eplus.ops.afn.idfobject import IDFAFNExternalNode
+from plan2eplus.ops.afn.idfobject import IDFAFNExternalNode
 from utils4plans.lists import sort_and_group_objects
 from pathlib import Path
 from typing import NamedTuple
-from replan2eplus.ezcase.objects import Subsurface
-from replan2eplus.ops.afn.ezobject import Airboundary
-from replan2eplus.results.sql import get_qoi
+from plan2eplus.ezcase.objects import Subsurface
+from plan2eplus.ops.afn.ezobject import Airboundary
+from plan2eplus.results.sql import get_qoi
 import xarray as xr
-from replan2eplus.ezcase.ez import EZ
-from replan2eplus.geometry.domain import Domain
-from replan2eplus.geometry.ortho_domain import OrthoDomain
-from replan2eplus.ops.zones.ezobject import Zone
-from replan2eplus.geometry.contact_points import calculate_cardinal_points
-from replan2eplus.visuals.domains import calculate_cardinal_domain
+from plan2eplus.ezcase.ez import EZ
+from plan2eplus.geometry.domain import Domain
+from plan2eplus.geometry.ortho_domain import OrthoDomain
+from plan2eplus.ops.zones.ezobject import Zone
+from plan2eplus.geometry.contact_points import (
+    CardinalPoints,
+    calculate_cardinal_points,
+)
+from plan2eplus.visuals.domains import calculate_cardinal_domain
 from msd2.analysis.data import calc_net_flow
 from msd2.graph_analysis.interfaces import (
     AFNEdge,
@@ -72,11 +75,10 @@ def get_space_arr(arr: xr.DataArray, name: str):
         raise Exception(f"Could not find data for {name} in {arr}")
 
 
-def make_graph(idf_path: Path, sql_path: Path):
-    def make_afn_nodes_from_external_nodes(extnode: IDFExternalNode):
-        cardinal_locations = calculate_cardinal_points(
-            calculate_cardinal_domain([i.domain for i in afn_zones])
-        )
+def make_graph(idf_path: Path, sql_path: Path, cardinal_expansion_factor: float = 1.3):
+    def make_afn_nodes_from_external_nodes(
+        extnode: IDFExternalNode, cardinal_locations: CardinalPoints
+    ):
         return ExternalNode(
             extnode.direction,
             data=ExternalNodeData(
@@ -130,7 +132,16 @@ def make_graph(idf_path: Path, sql_path: Path):
     zone_nodes = [make_afn_node_from_zone(i) for i in afn_zones]
     G.add_afn_nodes(zone_nodes)
 
-    afn_ext_nodes = [make_afn_nodes_from_external_nodes(i) for i in external_nodes]
+    cardinal_locations = calculate_cardinal_points(
+        calculate_cardinal_domain(
+            [i.domain for i in afn_zones],
+            cardinal_expansion_factor=cardinal_expansion_factor,
+        )
+    )
+    afn_ext_nodes = [
+        make_afn_nodes_from_external_nodes(i, cardinal_locations)
+        for i in external_nodes
+    ]
     G.add_afn_nodes(afn_ext_nodes)
 
     edge_nodes = [make_edge_from_surface(i) for i in afn_surfaces]

@@ -1,8 +1,9 @@
 include: "rules/common.smk"
-include: "rules/polymap.smk"
+include: "rules/polyfix.smk"
 include: "rules/msd.smk"
 include: "rules/eplus.smk"
 include: "rules/analysis.smk"
+include: "rules/graph.smk"
 
 
 rule hello:

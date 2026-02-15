@@ -1,11 +1,11 @@
 import xarray as xr
 from pathlib import Path
 from typing import NamedTuple
-from replan2eplus.results.sql import get_qoi
-from replan2eplus.ops.output.interfaces import OutputVariables
+from plan2eplus.results.sql import get_qoi
+from plan2eplus.ops.output.interfaces import OutputVariables
 
 
-from replan2eplus.ezcase.ez import EZ
+from plan2eplus.ezcase.ez import EZ
 
 
 class Metrics(NamedTuple):

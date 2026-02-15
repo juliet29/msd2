@@ -1,6 +1,6 @@
 from typing import Literal, NamedTuple
 from utils4plans.geom import Coord
-from polymap.geometry.ortho import FancyOrthoDomain
+from polyfix.geometry.ortho import FancyOrthoDomain
 import shapely as sp
 from pydantic import BaseModel
 

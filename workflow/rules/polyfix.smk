@@ -5,16 +5,16 @@ min_version("6.0")
 include: "common.smk"
 configfile: "config/test.yaml"
 
-polymap_path = "../../../../polymap/workflow/rules/cleanup.smk" # TODO in production, use github
-# github_path = github("juliet29/polymap", path="workflow/Snakefile", branch="decimals")
+polyfix_path = "../../../../polyfix/workflow/rules/cleanup.smk" # TODO in production, use github
+# github_path = github("juliet29/polyfix", path="workflow/Snakefile", branch="decimals")
 
-module polymap:
-    snakefile: polymap_path 
+module polyfix:
+    snakefile: polyfix_path 
     config: config
 
-use rule * from polymap as polymap_*
+use rule * from polyfix as polyfix_*
  
-use rule rotate from polymap as polymap_rotate with:
+use rule rotate from polyfix as polyfix_rotate with:
   input: 
       "<output_loc>/{sample}/layout/out.json"
 

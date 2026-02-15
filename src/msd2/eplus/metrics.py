@@ -1,9 +1,9 @@
 from pathlib import Path
 import polars as pl
-from replan2eplus.ezcase.ez import EZ
+from plan2eplus.ezcase.ez import EZ
 from loguru import logger
 from rich.pretty import pretty_repr
-from replan2eplus.visuals.domains import compute_multidomain
+from plan2eplus.visuals.domains import compute_multidomain
 import patito as pt
 
 

@@ -3,7 +3,7 @@ import polars as pl
 
 from pathlib import Path
 
-from polymap.cli.make.utils import get_case_name
+from polyfix.cli.make.utils import get_case_name
 
 
 def handle_design_metrics(paths: list[Path]):

@@ -1,12 +1,7 @@
 # analysis
 
 configfile: "config/test.yaml"
-def get_analysis_ready_samples(wildcards):
-  loc = Path(config["pathvars"]["models_loc"])
-  path = loc / "{sample}" / "results/eplusout.sql" 
-
-  samples, = glob_wildcards(path)
-  return samples
+include: "common.smk"
 
 rule make_data: 
   input: 
@@ -45,7 +40,7 @@ rule summarize_metrics:
   shell:
     "uv run msd create-summary-metrics {input.paths} --outpath {output.outpath}"
 
-rule shellummarize_data:
+rule summarize_data:
   input:
     paths=expand("<models_loc>/{sample}/analysis/data.nc",  sample=get_analysis_ready_samples)
   output:  

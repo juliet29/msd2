@@ -1,4 +1,4 @@
-from replan2eplus.ezcase.ez import EZ
+from plan2eplus.ezcase.ez import EZ
 import networkx as nx
 from loguru import logger
 from rich.pretty import pretty_repr

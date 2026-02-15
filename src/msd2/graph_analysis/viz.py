@@ -1,4 +1,5 @@
 from loguru import logger
+from msd2.analysis.data import QOIRegistry
 from msd2.graph_analysis.interfaces import AFNGraph
 import xarray as xr
 import matplotlib.pyplot as plt
@@ -40,23 +41,23 @@ def select_time(arr: xr.DataArray, dt: datetime = make_datetime()):
     return float(arr.sel(datetimes=dt).data)
 
 
-def viz_graph(G: AFNGraph, scale: int = 40):
+def viz_graph(G: AFNGraph, scale: int = 40, show: bool = False):
     fig, ax = plt.subplots()
 
     nodedata = [
         select_time(i.data.mix_volume + i.data.vent_volume) for i in G.zone_nodes
     ]
-    logger.debug(nodedata)
+    # logger.debug(nodedata)
     norm_data = norm_size(nodedata, scale)
-    logger.debug(norm_data)
+    # logger.debug(norm_data)
 
     edgedata = [select_time(i.data.net_flow_rate) for i in G.edges_with_data]
     display_edgedata = [rf"${i:.2f}$" for i in edgedata]
     edge_graph_at_time = G.make_time_specific_digraph(edgedata)
 
-    logger.debug(edgedata)
+    # # logger.debug(edgedata)
     norm_edge = norm_edge_fx(edgedata)
-    logger.debug(norm_edge)
+    # logger.debug(norm_edge)
 
     node_only_subgraph = nx.Graph()
     node_only_subgraph.add_nodes_from(G.zone_names)
@@ -67,17 +68,18 @@ def viz_graph(G: AFNGraph, scale: int = 40):
     cmap = plt.cm.Blues  # pyright: ignore[reportAttributeAccessIssue]
 
     # edges
-    network_artist = ipx.network(
+    edges_artist = ipx.network(
         edge_graph_at_time,
         ax=ax,
         layout=G.layout,
-        edge_labels=display_edgedata,
+        # edge_labels=display_edgedata,
         style={
             "edge": {
                 "linewidth": norm_edge,
                 "color": edge_colors,
                 "cmap": cmap,
                 "label": {"bbox": {"facecolor": "#4f5661"}},
+                "shrink": 5,
             },
             "vertex": {
                 "marker": "o",
@@ -86,7 +88,7 @@ def viz_graph(G: AFNGraph, scale: int = 40):
         },
     )
     # zones and size
-    ipx.network(
+    zones_artist = ipx.network(
         node_only_subgraph,
         ax=ax,
         layout=G.layout,
@@ -99,13 +101,14 @@ def viz_graph(G: AFNGraph, scale: int = 40):
             }
         },
     )
-
+    # external nodes
     ipx.network(
-        G.subgraph(G.external_node_names),
+        G.external_node_only_subgraph,
         ax=ax,
         layout=G.layout,
-        vertex_labels=G.external_node_names,
+        vertex_labels=list(G.external_node_only_subgraph.nodes),
         fontsize="xx-small",
+        strip_axes=False,
         style={
             "vertex": {
                 "marker": "o",
@@ -115,8 +118,14 @@ def viz_graph(G: AFNGraph, scale: int = 40):
             }
         },
     )
-    fig.colorbar(
-        network_artist[0].get_edges(),
+    cbar = fig.colorbar(
+        edges_artist[0].get_edges(),
         ax=ax,
     )
-    plt.show()
+    cbar.set_label(QOIRegistry.net_flow.label)
+    # res = zones_artist[0].get_nodes()
+    # logger.debug(str(res))
+    # ax.legend(res)
+    if show:
+        plt.show()
+    return fig

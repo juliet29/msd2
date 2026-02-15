@@ -136,7 +136,11 @@ def show_graph():  # 6289
 def try_make_graph():  # 6289
     g = read_pickle(DynamicPaths.temp, "test_graph")
     logger.debug(g)
-    viz_graph(g)
+    logger.debug(pretty_repr(g.layout))
+
+    fig = viz_graph(g, show=True)
+    # sp = DynamicPaths.temp / "tempgraph.png"
+    # fig.savefig(sp, dpi=300)
     # logger.debug(g)
     # logger.debug(pretty_repr([i for i in g.nodes(data=True)]))
     # logger.debug(pretty_repr([i for i in g.edges(data=True)]))

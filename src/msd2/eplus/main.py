@@ -2,7 +2,7 @@ from collections import Counter
 from pathlib import Path
 
 from loguru import logger
-from replan2eplus.ops.subsurfaces.user_interfaces import (
+from plan2eplus.ops.subsurfaces.user_interfaces import (
     EdgeGroup,
     SubsurfaceInputs,
     Edge,
@@ -13,10 +13,10 @@ from msd2.eplus.interfaces import (
     read_edges_to_ezcase_edge_groups,
     read_layout_to_ezcase_rooms,
 )
-from replan2eplus.ezcase.ez import EZ
-from replan2eplus.ops.zones.user_interface import Room
+from plan2eplus.ezcase.ez import EZ, RunVariablesInput
+from plan2eplus.ops.zones.user_interface import Room
 from msd2.config import ANALYSIS_PERIOD, WEATHER_FILE
-from replan2eplus.ops.subsurfaces.logic.select import get_zones_by_plan_name
+from plan2eplus.ops.subsurfaces.logic.select import get_zones_by_plan_name
 
 
 def handle_windows(case: EZ, windows_edge_group: EdgeGroup):
@@ -105,12 +105,16 @@ def layout_to_idf(edge_path: Path, layout_path: Path, outpath: Path):
     return case
 
 
-def idf_to_results(idf_path: Path, output_directory: Path):
+def idf_to_results(idf_path: Path, results_directory: Path, schedules_directory: Path):
     case = EZ(idf_path, read_existing=False)
     case.save_and_run(
-        output_path=output_directory.parent,
-        epw_path=WEATHER_FILE,
-        analysis_period=ANALYSIS_PERIOD,
+        run_vars=RunVariablesInput(
+            output_idf_path=idf_path,
+            output_results_path=results_directory,
+            output_schedules_path=schedules_directory,
+            epw_path=WEATHER_FILE,
+            analysis_period=ANALYSIS_PERIOD,
+        ),
         run=True,
         save=False,
     )
