@@ -21,8 +21,8 @@ app.command(setup_app)
 
 
 @app.command()  # TODO: may be a snakemake only command for generating the samples..
-def get_ids(start_ix: int, num_samples: int):
-    res = get_ids_by_indices(start_ix, num_samples)
+def get_ids(path_to_valid_ids: Path, start_ix: int, num_samples: int):
+    res = get_ids_by_indices(path_to_valid_ids, start_ix, num_samples)
     logger.info(res)
     return res
 

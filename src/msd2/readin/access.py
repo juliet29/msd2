@@ -1,3 +1,4 @@
+from pathlib import Path
 import kagglehub
 import polars as pl
 from dataframely import LazyFrame
@@ -38,10 +39,8 @@ def sample_unit_ids(num_samples: int = NUM_SAMPLES, seed: int = SEED) -> list[in
     return sorted(sample_ids.tolist())
 
 
-def get_ids_by_indices(start_ix: int, num_samples: int):
-    df = pl.read_csv(DynamicPaths.valid_ids_csv).slice(
-        offset=start_ix, length=num_samples
-    )
+def get_ids_by_indices(path_to_valid_ids: Path, start_ix: int, num_samples: int):
+    df = pl.read_csv(path_to_valid_ids).slice(offset=start_ix, length=num_samples)
     res = df.to_series().cast(pl.Int64).to_list()
     logger.info(f"Unit IDs in [{start_ix}:{start_ix+num_samples}]: {res}")
     return res

@@ -1,5 +1,6 @@
 pathvars:
   # input_loc: "static/_04_temp/workflow2/inputs" # TODO change to be sample specific.. # also create a proper test folder
+  ids_loc: "static/_04_temp/msd_stats/valid_ids.csv"
   input_loc: "static/_04_temp/snakemake/test" # TODO: change polymap to match this
   output_loc: "static/_04_temp/snakemake/test"
   models_loc: "static/_03_models/snakemake/test"
