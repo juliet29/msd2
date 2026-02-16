@@ -6,10 +6,11 @@ include: "common.smk"
 configfile: "config/test.yaml"
 
 polyfix_path = "../../../../polyfix/workflow/rules/cleanup.smk" # TODO in production, use github
-# github_path = github("juliet29/polyfix", path="workflow/Snakefile", branch="decimals")
+
+polyfix_github = github("juliet29/polyfix", path="workflow/rules/cleanup.smk", tag="v0.1.6")
 
 module polyfix:
-    snakefile: polyfix_path 
+    snakefile: polyfix_github
     config: config
 
 use rule * from polyfix as polyfix_*
