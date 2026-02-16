@@ -9,7 +9,6 @@ from msd2.readin.filters import filter_to_areas
 from msd2.readin.interfaces import MSDSchema
 
 from utils4plans.io import read_json
-from msd2.paths import DynamicPaths
 from msd2.config import NUM_SAMPLES, SEED
 import numpy as np
 
@@ -26,9 +25,11 @@ def access_dataset() -> LazyFrame[MSDSchema]:
     return MSDSchema.cast(lf)
 
 
-def sample_unit_ids(num_samples: int = NUM_SAMPLES, seed: int = SEED) -> list[int]:
+def sample_unit_ids(
+    path_to_valid_ids: Path, num_samples: int = NUM_SAMPLES, seed: int = SEED
+) -> list[int]:
 
-    valid_unit_ids: list[int] = read_json(DynamicPaths.valid_ids_json)
+    valid_unit_ids: list[int] = read_json(path_to_valid_ids)
     assert num_samples < len(
         valid_unit_ids
     ), f"N_samples={num_samples} > n_valid_ids {len(valid_unit_ids)}"
@@ -47,9 +48,10 @@ def get_ids_by_indices(path_to_valid_ids: Path, start_ix: int, num_samples: int)
 
 
 def access_sample_datasets_areas_only(
+    path_to_valid_ids: Path,
     num_samples: int = NUM_SAMPLES,
 ) -> LazyFrame[MSDSchema]:
-    sample_ids = sample_unit_ids(num_samples)
+    sample_ids = sample_unit_ids(path_to_valid_ids, num_samples)
 
     logger.info(f"Sampled IDs: {sample_ids}")
     res = (
@@ -61,9 +63,10 @@ def access_sample_datasets_areas_only(
 
 
 def access_random_sample_datasets(
+    path_to_valid_ids: Path,
     num_samples: int = NUM_SAMPLES,
 ) -> LazyFrame[MSDSchema]:
-    sample_ids = sample_unit_ids(num_samples)
+    sample_ids = sample_unit_ids(path_to_valid_ids, num_samples)
 
     logger.info(f"Sampled IDs: {sample_ids}")
     res = access_dataset().filter(pl.col("unit_id").is_in(sample_ids))
@@ -77,10 +80,10 @@ def access_datasets_by_unit_ids(unit_ids: list[float]) -> LazyFrame[MSDSchema]:
 
 
 def access_one_sample_dataset(
-    sample_id: float | None = None, seed: int = SEED
+    path_to_valid_ids: Path, sample_id: float | None = None, seed: int = SEED
 ) -> LazyFrame[MSDSchema]:
     if not sample_id:
-        sample_id = sample_unit_ids(1, seed=seed)[0]
+        sample_id = sample_unit_ids(path_to_valid_ids, 1, seed=seed)[0]
     print(f"Sampled ID: {sample_id}")
     res = access_dataset().filter(pl.col("unit_id") == sample_id)
     return MSDSchema.cast(res)
