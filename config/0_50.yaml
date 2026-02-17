@@ -1,5 +1,6 @@
 pathvars:
   ids_loc: "static/_04_temp/msd_stats/valid_ids.csv"
+  msd_config_loc: "msdconfig/test.yaml"
   input_loc: "static/_04_temp/snakemake/0_50"
   output_loc: "static/_04_temp/snakemake/0_50" # TODO change to match others..
 

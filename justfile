@@ -34,7 +34,24 @@ outpng:= "out.png"
 set-out:
   set --path msd2out 'static/_04_temp/workflow/outputs'
 
-# Fixing geometry 
+
+
+# Evaluating geometry fixes 
+
+find-ortho-only:
+  ./scripts/ortho_only.sh
+
+show-ortho-only:
+  ./scripts/ortho_only.sh | xargs -I {} kitty icat {}/rotate/out.png
+
+summarize folder:
+  ./scripts/summary.sh {{folder}}
+
+
+# -------------- TESTS of the CLI -------------
+
+
+# Fixing geometry --------------------
 
 trial-xplan: update-poly
   uv run preproc plan "X" {{dir}}/simplify/{{outjson}} {{dir}}/xplan/{{outpng}} {{dir}}/xplan/{{outjson}}
@@ -58,22 +75,11 @@ trial-one case:
   uv run snakemake -c 1 -f {{output}}/{{case}}/ymove/{{outjson}}
 
 
-# Evaluating geometry fixes 
-
-find-ortho-only:
-  ./scripts/ortho_only.sh
-
-show-ortho-only:
-  ./scripts/ortho_only.sh | xargs -I {} kitty icat {}/rotate/out.png
-
-summarize folder:
-  ./scripts/summary.sh {{folder}}
 
 
+# Running Eplus models ------------------
+models_dir := "static/_03_models/snakemake/test"
+trial-run-idf case:
+  uv run msd run-idf --idf_path={{models_dir}}/{{case}}/out.idf --results_directory={{models_dir}}/{{case}}/results --schedules_directory={{models_dir}}/{{case}}/schedules --msd_config_path=msdconfig/test.yaml
 
-# Running Eplus models 
-create-idf case run:
-  uv run cli create-idf {{case}} {{run}}
 
-
-# Testing out metric calcs .. 

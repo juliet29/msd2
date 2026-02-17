@@ -38,11 +38,12 @@ rule run_idf:
   output:
     directory("<models_loc>/{sample}/results")
   params:
-    schedules="<models_loc>/{sample}/schedules"  
+    schedules= lambda wildcards: Path("<models_loc>") / wildcards.sample / "schedules",
+    msd_config=config["pathvars"]["msd_config_loc"]
   log:
     "<models_loc>/{sample}/run.log"
   shell:
-    "uv run msd run-idf {input} {output} '{params.schedules}' 2>{log}"
+    "uv run msd run-idf {input} {output} '{params.schedules}' '{params.msd_config}' 2>{log}"
 
 rule run_idf_all:
   input:

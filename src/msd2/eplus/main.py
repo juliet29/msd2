@@ -8,6 +8,7 @@ from plan2eplus.ops.subsurfaces.user_interfaces import (
     Edge,
 )
 from rich.pretty import pretty_repr
+from msd2.config import MSDConfig
 from msd2.eplus.interfaces import (
     make_details,
     read_edges_to_ezcase_edge_groups,
@@ -15,11 +16,11 @@ from msd2.eplus.interfaces import (
 )
 from plan2eplus.ezcase.ez import EZ, RunVariablesInput
 from plan2eplus.ops.zones.user_interface import Room
-from msd2.config import ANALYSIS_PERIOD, WEATHER_FILE
 from plan2eplus.ops.subsurfaces.logic.select import get_zones_by_plan_name
 
 
 def handle_windows(case: EZ, windows_edge_group: EdgeGroup):
+    # TODO: this is a temporary solution for the msd dataset
     def create(edge: Edge):
         zone_a = get_zones_by_plan_name(edge.space_a, case.objects.zones)
         seen_zones[zone_a.zone_name] += 1
@@ -61,10 +62,13 @@ def handle_edge_groups(case: EZ, edge_groups: list[EdgeGroup]):
     return edge_groups
 
 
+# NOTE: At point of creating the idf, dont care about the weather file or analysis period, only when running the file. This allows to avoid having to recreate the IDF for these simple non-geometric parameters
+
+
 def generate_idf(
     rooms: list[Room], edge_groups: list[EdgeGroup], out_path: Path, run: bool = False
 ):
-    case = EZ(output_path=out_path, epw_path=WEATHER_FILE)
+    case = EZ(output_path=out_path)
     case.add_zones(rooms)
 
     corrected_edge_groups = handle_edge_groups(case, edge_groups)
@@ -98,22 +102,26 @@ def layout_to_idf(edge_path: Path, layout_path: Path, outpath: Path):
     for eg in egs:
         logger.debug(f"Edges to add: {pretty_repr([i.as_tuple for i in eg.edges])}")
 
-    # for now, only consider door edges, need different approach for windows..
-    # # also need to do airboundaries
-
     case = generate_idf(rooms, egs, outpath.parent, run=False)
     return case
 
 
-def idf_to_results(idf_path: Path, results_directory: Path, schedules_directory: Path):
+def idf_to_results(
+    idf_path: Path,
+    results_directory: Path,
+    schedules_directory: Path,
+    msd_config_path: Path,
+):
+    msd_config = MSDConfig(msd_config_path)
+
     case = EZ(idf_path, read_existing=False)
     case.save_and_run(
         run_vars=RunVariablesInput(
             output_idf_path=idf_path,
             output_results_path=results_directory,
             output_schedules_path=schedules_directory,
-            epw_path=WEATHER_FILE,
-            analysis_period=ANALYSIS_PERIOD,
+            epw_path=msd_config.config.weather_file,
+            analysis_period=msd_config.config.analysis_period,
         ),
         run=True,
         save=False,

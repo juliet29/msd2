@@ -27,14 +27,14 @@ def get_ids(path_to_valid_ids: Path, start_ix: int, num_samples: int):
     return res
 
 
+#### ------- DATA GENERATION PIPELINE -------------
 @app.command()
 def generate(unit_id: float, edge_path: Path, layout_path: Path):
     write_unit(unit_id, edge_path, layout_path)
     pass
 
 
-#
-# TODO: feel that these thing should be part of plan2eplus?
+# NOTE: the middle layers, where we are cleaning up the the geometry, are handled by `polyfix` as part of the Snakemake workflow. Since the EnergyPlus model creation is specific to the MSD dataset and the anlysis that we are intersted in, that is handled in this module
 
 
 @app.command()
@@ -48,8 +48,13 @@ def create_idf(edge_path: Path, layout_path: Path, outpath: Path):
 
 
 @app.command()
-def run_idf(idf_path: Path, results_directory: Path, schedules_directory: Path):
-    idf_to_results(idf_path, results_directory, schedules_directory)
+def run_idf(
+    idf_path: Path,
+    results_directory: Path,
+    schedules_directory: Path,
+    msd_config_path: Path,
+):
+    idf_to_results(idf_path, results_directory, schedules_directory, msd_config_path)
 
 
 #### ------- DATA ANALYSIS PIPELINE -------------

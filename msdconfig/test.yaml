@@ -1,0 +1,9 @@
+room_height: 3 # m
+weather_file: "../../../weather_data/CA_PALO-ALTO-AP_724937S_20.epw"
+
+analysis_period:
+  name: "testing"
+  st_month: 6
+  st_day: 1
+  end_month: 7
+  end_day: 30
