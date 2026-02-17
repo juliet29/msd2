@@ -9,8 +9,9 @@ from msd2.readin.filters import filter_to_areas
 from msd2.readin.interfaces import MSDSchema
 
 from utils4plans.io import read_json
-from msd2.config import NUM_SAMPLES, SEED
 import numpy as np
+
+SEED = 12345
 
 
 def access_dataset() -> LazyFrame[MSDSchema]:
@@ -26,7 +27,7 @@ def access_dataset() -> LazyFrame[MSDSchema]:
 
 
 def sample_unit_ids(
-    path_to_valid_ids: Path, num_samples: int = NUM_SAMPLES, seed: int = SEED
+    path_to_valid_ids: Path, num_samples: int, seed: int = SEED
 ) -> list[int]:
 
     valid_unit_ids: list[int] = read_json(path_to_valid_ids)
@@ -49,7 +50,7 @@ def get_ids_by_indices(path_to_valid_ids: Path, start_ix: int, num_samples: int)
 
 def access_sample_datasets_areas_only(
     path_to_valid_ids: Path,
-    num_samples: int = NUM_SAMPLES,
+    num_samples: int,
 ) -> LazyFrame[MSDSchema]:
     sample_ids = sample_unit_ids(path_to_valid_ids, num_samples)
 
@@ -64,7 +65,7 @@ def access_sample_datasets_areas_only(
 
 def access_random_sample_datasets(
     path_to_valid_ids: Path,
-    num_samples: int = NUM_SAMPLES,
+    num_samples: int,
 ) -> LazyFrame[MSDSchema]:
     sample_ids = sample_unit_ids(path_to_valid_ids, num_samples)
 

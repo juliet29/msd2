@@ -38,8 +38,13 @@ def generate(unit_id: float, edge_path: Path, layout_path: Path):
 
 
 @app.command()
-def create_idf(edge_path: Path, layout_path: Path, outpath: Path):
-    case = layout_to_idf(edge_path, layout_path, outpath)
+def create_idf(
+    edge_path: Path,
+    layout_path: Path,
+    outpath: Path,
+    msd_config_path: Path,
+):
+    case = layout_to_idf(edge_path, layout_path, outpath, msd_config_path)
     # TODO: make a nice finishing statement w/ number of zones...
     n_zone = len(case.objects.zones)
     n_subsurface = len(case.objects.subsurfaces)

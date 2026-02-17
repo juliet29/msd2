@@ -3,6 +3,7 @@ from pathlib import Path
 
 from loguru import logger
 from plan2eplus.ops.subsurfaces.user_interfaces import (
+    Detail,
     EdgeGroup,
     SubsurfaceInputs,
     Edge,
@@ -10,6 +11,7 @@ from plan2eplus.ops.subsurfaces.user_interfaces import (
 from rich.pretty import pretty_repr
 from msd2.config import MSDConfig
 from msd2.eplus.interfaces import (
+    DETAIL_TYPES,
     make_details,
     read_edges_to_ezcase_edge_groups,
     read_layout_to_ezcase_rooms,
@@ -62,11 +64,15 @@ def handle_edge_groups(case: EZ, edge_groups: list[EdgeGroup]):
     return edge_groups
 
 
-# NOTE: At point of creating the idf, dont care about the weather file or analysis period, only when running the file. This allows to avoid having to recreate the IDF for these simple non-geometric parameters
+# NOTE: At point of creating the idf, dont care about the weather file or analysis period - we let the default values be used. We care only when running the file. This allows to avoid having to recreate the IDF for these simple non-geometric parameters
 
 
 def generate_idf(
-    rooms: list[Room], edge_groups: list[EdgeGroup], out_path: Path, run: bool = False
+    rooms: list[Room],
+    edge_groups: list[EdgeGroup],
+    details: dict[DETAIL_TYPES, Detail],
+    out_path: Path,
+    run: bool = False,
 ):
     case = EZ(output_path=out_path)
     case.add_zones(rooms)
@@ -74,7 +80,7 @@ def generate_idf(
     corrected_edge_groups = handle_edge_groups(case, edge_groups)
 
     subsurface_inputs = SubsurfaceInputs(
-        corrected_edge_groups, make_details()  # pyright: ignore[reportArgumentType]
+        corrected_edge_groups, details  # pyright: ignore[reportArgumentType]
     )
     case.add_subsurfaces(subsurface_inputs)
 
@@ -93,16 +99,25 @@ def generate_idf(
     return case
 
 
-def layout_to_idf(edge_path: Path, layout_path: Path, outpath: Path):
-    rooms = read_layout_to_ezcase_rooms(layout_path)
-    # only doing one type for now
+def layout_to_idf(
+    edge_path: Path,
+    layout_path: Path,
+    outpath: Path,
+    msd_config_path: Path,
+):
+
+    msd_config = MSDConfig(msd_config_path)
+    rooms = read_layout_to_ezcase_rooms(layout_path, msd_config.config.room_height)
+
     edge_group_holder = read_edges_to_ezcase_edge_groups(edge_path)
     egs = [edge_group_holder.interior_door_edges, edge_group_holder.window_edges]
     logger.debug(f"Rooms to add: {[i.name for i in rooms]}")
     for eg in egs:
         logger.debug(f"Edges to add: {pretty_repr([i.as_tuple for i in eg.edges])}")
 
-    case = generate_idf(rooms, egs, outpath.parent, run=False)
+    details = make_details(msd_config.config.room_height)
+
+    case = generate_idf(rooms, egs, details, outpath.parent, run=False)
     return case
 
 

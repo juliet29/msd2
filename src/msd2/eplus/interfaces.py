@@ -15,27 +15,26 @@ from plan2eplus.ops.subsurfaces.user_interfaces import (
 from plan2eplus.ops.zones.user_interface import Room
 from utils4plans.io import read_json
 
-from msd2.config import ROOM_HEIGHT
 from msd2.geom.interfaces import MSDEdgeModel, MSDEdgesModel
 
 
 class GeomPlan(LayoutModel):
-    @property
-    def ezcase_rooms(self):
+
+    def ezcase_rooms(self, room_height: float):
         def domain_to_room(id: int, dom: FancyOrthoDomain):
             coords = map(lambda x: Coord(*x), dom.coords)
             ortho_dom = OrthoDomain(list(coords))
-            return Room(id, dom.name, ortho_dom, ROOM_HEIGHT, reverse_coords=True)
+            return Room(id, dom.name, ortho_dom, room_height, reverse_coords=True)
 
         layout = self.to_layout()
         rooms = [domain_to_room(ix, i) for ix, i in enumerate(layout.domains)]
         return rooms
 
 
-def read_layout_to_ezcase_rooms(path: Path):
+def read_layout_to_ezcase_rooms(path: Path, room_height: float):
     data = read_json(path)
     geom_plan = GeomPlan.model_validate(data)
-    return geom_plan.ezcase_rooms
+    return geom_plan.ezcase_rooms(room_height)
 
 
 DETAIL_TYPES = Literal["window", "door"]
@@ -95,16 +94,16 @@ def read_edges_to_ezcase_edge_groups(path: Path):
     return distinguished_edges
 
 
-def make_details():
+def make_details(room_height: float):
     door_detail = Detail(
-        Dimension(width=10, height=ROOM_HEIGHT * 0.7),
+        Dimension(width=10, height=room_height * 0.7),
         location=Location(
             "bm", "SOUTH", "SOUTH"
         ),  # TODO: create list of reasonable defaults, so dont have to think about this..
         type_="Door",
     )
     window_detail = Detail(
-        Dimension(width=10, height=ROOM_HEIGHT * 0.5),
+        Dimension(width=10, height=room_height * 0.5),
         location=Location("mm", "CENTROID", "CENTROID"),
         type_="Window",
     )
