@@ -1739,7 +1739,7 @@ wheels = [
 
 [[package]]
 name = "plan2eplus"
-version = "0.1.4"
+version = "0.1.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bpython" },
@@ -1770,9 +1770,9 @@ dependencies = [
     { name = "xarray" },
     { name = "xarray-schema" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/0e/30/d835a7e60404d23f5dbadb6e359736b6f9b0eb3aa4dc5b1a11b8e2c39dae/plan2eplus-0.1.4.tar.gz", hash = "sha256:b9069231229b485e7d58e357bd2317f4589f392c5d0869cd8638a8ed69207041", size = 59943, upload-time = "2026-02-14T22:43:40.87Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/99/ee/d5bf66eef5fbd8e7a9f5b10f6b537b28c8e57183a7173e3d532b6cd8a683/plan2eplus-0.1.5.tar.gz", hash = "sha256:9b9d9de6af121e8f14e7ad0e0e0ef8aa2109e44f147bd5d9deb90695c586bd03", size = 60071, upload-time = "2026-02-18T18:36:50.71Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/eb/80/4a52d4818a3c938614aa00873e8d3f79ee8791ef9d17c3c8b5be8c59021b/plan2eplus-0.1.4-py3-none-any.whl", hash = "sha256:a42742692fdc41d6601ef0fac1bc4f84f176816136994e67a9a1f7442d922856", size = 103427, upload-time = "2026-02-14T22:43:39.352Z" },
+    { url = "https://files.pythonhosted.org/packages/6f/be/17170c5edc93b5a4df80e6b3da4e1b67d2e802eee83cbd39c0e17d6ea418/plan2eplus-0.1.5-py3-none-any.whl", hash = "sha256:9f447e0fa128c0a7db7cc1cf1b288f23728eed53281c4d704de905669fb83240", size = 103721, upload-time = "2026-02-18T18:36:49.616Z" },
 ]
 
 [[package]]

@@ -5,8 +5,8 @@ welcome:
 update-poly:
   uv add /Users/julietnwagwuume-ezeoke/_UILCode/gqe-phd/fpopt/polymap
 
-update-replan:
-  uv add /Users/julietnwagwuume-ezeoke/_UILCode/gqe-phd/fpopt/replan2eplus
+update-plan:
+  uv add plan2eplus --upgrade-package plan2eplus 
 
 update-replan-geomeppy:
   uv add ~/_UILCode/gqe-phd/fpopt/replan2eplus
