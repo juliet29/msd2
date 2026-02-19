@@ -1,9 +1,10 @@
 welcome:
-  echo 'Welcome to just!'
+  echo 'Welcome to msd2!'
 
 
+# -------------- UPDATE DEPENDENCIES -------------
 update-poly:
-  uv add /Users/julietnwagwuume-ezeoke/_UILCode/gqe-phd/fpopt/polymap
+  uv add polyfix --upgrade-package polyfix 
 
 update-plan:
   uv add plan2eplus --upgrade-package plan2eplus 
@@ -20,21 +21,17 @@ update-deps:
   uv add /Users/julietnwagwuume-ezeoke/_UILCode/gqe-phd/fpopt/polymap
 
 
+# -------------- PUBLISH PACKAGE -------------
+push-tag end:
+  git tag -a s0.0.{{end}} -m s0.0.{{end}}
+  git push --tag
 
 
-output := 'static/_04_temp/workflow/outputs'
-plan := '97837'
-dir := join(output, plan)
-
-outjson := "out.json"
-outpng:= "out.png"
+publish-tag end:
+  git tag -a v0.0.{{end}} -m v0.0.{{end}}
 
 
-# Utils 
-set-out:
-  set --path msd2out 'static/_04_temp/workflow/outputs'
-
-
+# -------------- EVALUATE GEOMETRY -------------
 
 # Evaluating geometry fixes 
 
@@ -52,6 +49,17 @@ summarize folder:
 
 
 # Fixing geometry --------------------
+output := 'static/_04_temp/workflow/outputs'
+plan := '97837'
+dir := join(output, plan)
+
+outjson := "out.json"
+outpng:= "out.png"
+
+
+# Utils 
+set-out:
+  set --path msd2out 'static/_04_temp/workflow/outputs'
 
 trial-xplan: update-poly
   uv run preproc plan "X" {{dir}}/simplify/{{outjson}} {{dir}}/xplan/{{outpng}} {{dir}}/xplan/{{outjson}}

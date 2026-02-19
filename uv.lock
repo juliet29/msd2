@@ -1821,7 +1821,7 @@ wheels = [
 
 [[package]]
 name = "polyfix"
-version = "0.1.0"
+version = "0.1.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bpython" },
@@ -1846,9 +1846,9 @@ dependencies = [
     { name = "utils4plans" },
     { name = "whenever" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e6/4e/df713afa1aa3611927be296bddeab915244c4a788debdfe3256b13ec8b5a/polyfix-0.1.0.tar.gz", hash = "sha256:d8a788f12532b887bff5e2146761687c36c0e29d2b29ed5c874dd50b470731cc", size = 32277, upload-time = "2026-02-10T21:20:03.36Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d3/57/a8102ded33b9bfddf18e12e23e18eae0498969f117610c60c581531ef5c0/polyfix-0.1.8.tar.gz", hash = "sha256:8775cf94c93f24d2a09eacb256a687006f5ba0d6bd8be51713e2fe54776431ad", size = 32320, upload-time = "2026-02-18T19:26:00.277Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/30/2a/05131ba06655122428c4e6e2a2f5220ee5f53075ac2d0507ce0ed2a4b7a6/polyfix-0.1.0-py3-none-any.whl", hash = "sha256:376e01fd91ee05d07120e38fdb1ba6989da0de5f954edd6d97b015aab9bf88ea", size = 50655, upload-time = "2026-02-10T21:20:04.398Z" },
+    { url = "https://files.pythonhosted.org/packages/9f/e5/e1740f261044f609fe3bcd7aa4506a485031ec161764878194fded044209/polyfix-0.1.8-py3-none-any.whl", hash = "sha256:a516922281c65a128309385c333297f6dce32e4a0f4b5dca4b8fac7f32334d15", size = 51031, upload-time = "2026-02-18T19:25:58.71Z" },
 ]
 
 [[package]]

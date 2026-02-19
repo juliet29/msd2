@@ -8,7 +8,6 @@ from utils4plans.logconfig import logset
 from msd2.analysis.data import collect_data
 from msd2.analysis.design_metrics import handle_design_metrics
 from msd2.analysis.metrics import make_summary_dataset
-from msd2.cli.setup import setup_app
 from msd2.eplus.main import idf_to_results, layout_to_idf
 from msd2.eplus.metrics import calc_plan_metrics_from_path
 from msd2.geom.io import write_unit
@@ -17,7 +16,7 @@ from msd2.graph_analysis.viz import viz_graph
 from msd2.readin.access import get_ids_by_indices
 
 app = App()
-app.command(setup_app)
+# app.command(setup_app)
 
 
 @app.command()  # TODO: may be a snakemake only command for generating the samples..
