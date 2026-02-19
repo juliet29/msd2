@@ -5,13 +5,7 @@ from dataframely import LazyFrame
 from kagglehub import KaggleDatasetAdapter
 
 from loguru import logger
-from msd2.readin.filters import filter_to_areas
 from msd2.readin.interfaces import MSDSchema
-
-from utils4plans.io import read_json
-import numpy as np
-
-SEED = 12345
 
 
 def access_dataset() -> LazyFrame[MSDSchema]:
@@ -26,21 +20,6 @@ def access_dataset() -> LazyFrame[MSDSchema]:
     return MSDSchema.cast(lf)
 
 
-def sample_unit_ids(
-    path_to_valid_ids: Path, num_samples: int, seed: int = SEED
-) -> list[int]:
-
-    valid_unit_ids: list[int] = read_json(path_to_valid_ids)
-    assert num_samples < len(
-        valid_unit_ids
-    ), f"N_samples={num_samples} > n_valid_ids {len(valid_unit_ids)}"
-
-    rng = np.random.default_rng(seed)
-    sample_ids = rng.choice(valid_unit_ids, size=num_samples, replace=False)
-
-    return sorted(sample_ids.tolist())
-
-
 def get_ids_by_indices(path_to_valid_ids: Path, start_ix: int, num_samples: int):
     df = pl.read_csv(path_to_valid_ids).slice(offset=start_ix, length=num_samples)
     res = df.to_series().cast(pl.Int64).to_list()
@@ -48,43 +27,9 @@ def get_ids_by_indices(path_to_valid_ids: Path, start_ix: int, num_samples: int)
     return res
 
 
-def access_sample_datasets_areas_only(
-    path_to_valid_ids: Path,
-    num_samples: int,
+def access_datasets_by_unit_ids(
+    unit_ids: list[float] | list[int],
 ) -> LazyFrame[MSDSchema]:
-    sample_ids = sample_unit_ids(path_to_valid_ids, num_samples)
-
-    logger.info(f"Sampled IDs: {sample_ids}")
-    res = (
-        access_dataset()
-        .pipe(filter_to_areas)
-        .filter(pl.col("unit_id").is_in(sample_ids))
-    )
-    return MSDSchema.cast(res)
-
-
-def access_random_sample_datasets(
-    path_to_valid_ids: Path,
-    num_samples: int,
-) -> LazyFrame[MSDSchema]:
-    sample_ids = sample_unit_ids(path_to_valid_ids, num_samples)
-
-    logger.info(f"Sampled IDs: {sample_ids}")
-    res = access_dataset().filter(pl.col("unit_id").is_in(sample_ids))
-    return MSDSchema.cast(res)
-
-
-def access_datasets_by_unit_ids(unit_ids: list[float]) -> LazyFrame[MSDSchema]:
     res = access_dataset().filter(pl.col("unit_id").is_in(unit_ids))
 
-    return MSDSchema.cast(res)
-
-
-def access_one_sample_dataset(
-    path_to_valid_ids: Path, sample_id: float | None = None, seed: int = SEED
-) -> LazyFrame[MSDSchema]:
-    if not sample_id:
-        sample_id = sample_unit_ids(path_to_valid_ids, 1, seed=seed)[0]
-    print(f"Sampled ID: {sample_id}")
-    res = access_dataset().filter(pl.col("unit_id") == sample_id)
     return MSDSchema.cast(res)

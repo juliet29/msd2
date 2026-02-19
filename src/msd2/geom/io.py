@@ -10,7 +10,7 @@ from msd2.geom.connectivity import Edge, extract_connectivity_graph
 from msd2.geom.create import df_unit_to_room_and_connection_data
 from msd2.geom.interfaces import MSDEdgeModel, MSDEdgesModel, RoomData
 from msd2.readin.access import (
-    access_one_sample_dataset,
+    access_datasets_by_unit_ids,
 )
 
 
@@ -33,7 +33,7 @@ def write_room_data_to_json_as_layout(rooms: list[RoomData], path: Path):
 
 
 def write_unit(unit_id: float, edge_path: Path, layout_path: Path):
-    df = access_one_sample_dataset(unit_id).collect()
+    df = access_datasets_by_unit_ids([unit_id]).collect()
 
     rooms, connections = df_unit_to_room_and_connection_data(df)
     edges = extract_connectivity_graph(rooms, connections)

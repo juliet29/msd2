@@ -1,4 +1,5 @@
 ## NOTE: These should be temoporary -> regularly move out to tests!
+from msd2.examples.paths import ExamplePaths
 from cyclopts import App
 
 from rich.pretty import pretty_repr
@@ -15,16 +16,12 @@ from msd2.analysis.metrics import (
 )
 from msd2.analysis.plots import make_corr_plot
 from msd2.eplus.metrics import calc_plan_metrics_from_path
-from msd2.geom.connectivity import extract_connectivity_graph
-from msd2.geom.create import df_unit_to_room_and_connection_data
 from msd2.graph_analysis.main import make_graph
 from msd2.graph_analysis.viz import viz_graph
-from msd2.paths import DynamicPaths, static_paths
-from msd2.readin.access import access_random_sample_datasets
 
 from loguru import logger
+from msd2.paths import static_paths
 
-from msd2.readin.interfaces import MSDSchema
 from msd2.readin.scripts import summarize_dataset
 
 
@@ -34,20 +31,6 @@ studies_app = App()
 @studies_app.command()
 def show_summarize_dataset():
     summarize_dataset()
-
-
-@studies_app.command()
-def try_edges():
-    df = access_random_sample_datasets(1).collect()
-    for name, data in df.group_by("unit_id"):
-        unit_id = name[0]
-        with logger.contextualize(unit_id=unit_id):
-            rooms, connections = df_unit_to_room_and_connection_data(
-                MSDSchema.validate(data)
-            )
-
-            edges = extract_connectivity_graph(rooms, connections)
-            logger.debug(pretty_repr(edges))
 
 
 @studies_app.command()
@@ -121,12 +104,12 @@ def make_test_graph(casenum: str = "6289"):  # 6289
     idf_path = path / "run.idf"
 
     g = make_graph(idf_path, path)
-    write_pickle(g, DynamicPaths.temp, "test_graph", OVERWRITE=True)
+    write_pickle(g, ExamplePaths.temp, "test_graph", OVERWRITE=True)
 
 
 @studies_app.command()
 def show_graph():  # 6289
-    g = read_pickle(DynamicPaths.temp, "test_graph")
+    g = read_pickle(ExamplePaths.temp, "test_graph")
     logger.debug(g)
     logger.debug(pretty_repr([i for i in g.nodes(data=True)]))
     logger.debug(pretty_repr([i for i in g.edges(data=True)]))
@@ -134,7 +117,8 @@ def show_graph():  # 6289
 
 @studies_app.command()
 def try_make_graph():  # 6289
-    g = read_pickle(DynamicPaths.temp, "test_graph")
+
+    g = read_pickle(ExamplePaths.temp, "test_graph")
     logger.debug(g)
     logger.debug(pretty_repr(g.layout))
 

@@ -47,7 +47,15 @@ def handle_windows(case: EZ, windows_edge_group: EdgeGroup):
     assert windows_edge_group.type_ == "Zone_Direction"
 
     seen_zones = Counter()
-    new_edges = [create(e) for e in windows_edge_group.edges]
+
+    new_edges = []
+    for e in windows_edge_group.edges:
+        try:
+            ne = create(e)
+            new_edges.append(ne)
+        except ValueError as err:
+            logger.error(f"Could not make window for {e}: {err}")
+
     new_group = EdgeGroup(
         new_edges, windows_edge_group.detail, windows_edge_group.type_
     )
@@ -78,10 +86,26 @@ def generate_idf(
     case.add_zones(rooms)
 
     corrected_edge_groups = handle_edge_groups(case, edge_groups)
+    logger.debug(len(corrected_edge_groups))
 
     subsurface_inputs = SubsurfaceInputs(
         corrected_edge_groups, details  # pyright: ignore[reportArgumentType]
     )
+    # counter = 0
+    # for edge_group in corrected_edge_groups:
+    #     for edge in edge_group.edges:
+    #         counter += 1
+    #         logger.debug(counter)
+    #         try:
+    #             singular_edge_group = EdgeGroup(
+    #                 [edge], edge_group.detail, edge_group.type_
+    #             )
+    #             subsurface_inputs = SubsurfaceInputs(
+    #                 singular_edge_group, details  # pyright: ignore[reportArgumentType]
+    #             )
+    #             case.add_subsurfaces(subsurface_inputs)
+    #         except ValueError as e:
+    #             logger.error(f"Error when trying to add edge {edge}: {e}")
     case.add_subsurfaces(subsurface_inputs)
 
     sinfo = [
@@ -102,7 +126,7 @@ def generate_idf(
 def layout_to_idf(
     edge_path: Path,
     layout_path: Path,
-    outpath: Path,
+    out_directory: Path,
     msd_config_path: Path,
 ):
 
@@ -117,7 +141,7 @@ def layout_to_idf(
 
     details = make_details(msd_config.config.room_height)
 
-    case = generate_idf(rooms, egs, details, outpath.parent, run=False)
+    case = generate_idf(rooms, egs, details, out_directory.parent, run=False)
     return case
 
 
