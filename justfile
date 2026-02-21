@@ -23,12 +23,21 @@ update-deps:
 
 # -------------- PUBLISH PACKAGE -------------
 push-tag end:
-  git tag -a s0.0.{{end}} -m s0.0.{{end}}
+  git tag -a s0.1.{{end}} -m s1.0.{{end}}
   git push --tag
 
 
 publish-tag end:
-  git tag -a v0.0.{{end}} -m v0.0.{{end}}
+  @echo "Have you updated the version number for pushing to pypi?" 
+  @read status;
+
+
+  @echo "Have you pushed the code with this new version number?" 
+  @read status;
+
+  git tag -a v0.1.{{end}} -m v0.1.{{end}}
+  git push --tag
+  gh run watch
 
 
 # -------------- EVALUATE GEOMETRY -------------
