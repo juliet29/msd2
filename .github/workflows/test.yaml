@@ -1,0 +1,32 @@
+name: Run Tests
+
+on: [push]
+
+env:
+  APP_ENV: "prod"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          # Install a specific version of uv.
+          version: "0.8.3"
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
+
+      - name: Test with pytest
+        run: |
+          uv run pytest tests --cov=msd2
+          echo "tests finished"
