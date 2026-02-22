@@ -35,6 +35,7 @@ rule make_idf_all:
 
 def make_schedule_loc(wildcards):
   loc = Path(config["pathvars"]["models_loc"])
+  # NOTE: f-string here is important since not using glob
   path = loc / f"{wildcards.sample}" / "schedules" 
   return path
 
