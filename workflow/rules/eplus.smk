@@ -33,6 +33,11 @@ rule make_idf_all:
   input:
     expand("<models_loc>/{sample}/out.idf",  sample=get_eplus_ready_samples)
 
+def make_schedule_loc(wildcards):
+  loc = Path(config["pathvars"]["models_loc"])
+  path = loc / f"{wildcards.sample}" / "schedules" 
+  return path
+
 
 rule run_idf: 
   input:
@@ -40,7 +45,7 @@ rule run_idf:
   output:
     directory("<models_loc>/{sample}/results")
   params:
-    schedules= lambda wildcards: Path("<models_loc>") / wildcards.sample / "schedules",
+    schedules=make_schedule_loc,
     msd_config=config["pathvars"]["msd_config_loc"]
   log:
     "<models_loc>/{sample}/run.log"

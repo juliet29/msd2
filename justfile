@@ -37,7 +37,7 @@ publish-tag end:
 
   git tag -a v0.1.{{end}} -m v0.1.{{end}}
   git push --tag
-  gh run watch
+  gh run list
 
 
 # -------------- EVALUATE GEOMETRY -------------
