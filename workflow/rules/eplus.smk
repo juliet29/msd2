@@ -21,7 +21,7 @@ rule make_idf:
   output:
     "<models_loc>/{sample}/out.idf" # TODO: turn to out.idf, or allow replan to just take the path 
   params:
-    msd_config=config["pathvars"]["msd_config_loc"]
+    msd_config=config["pathvars"]["msd_config_loc"] # in an ideal scenario this is part of the config file, just under a different section, and there is a clear schema.. 
   log:
     "<models_loc>/{sample}/out.log"
   shell:

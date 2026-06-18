@@ -23,7 +23,7 @@ update-deps:
 
 # -------------- PUBLISH PACKAGE -------------
 push-tag end:
-  git tag -a s0.1.{{end}} -m s1.0.{{end}}
+  git tag -a s0.1.{{end}} -m s0.1.{{end}}
   git push --tag
 
 
