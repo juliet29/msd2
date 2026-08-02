@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from loguru import logger
 from tqdm import tqdm
 
 from msd2.geom.io import write_unit
@@ -11,7 +12,7 @@ from msd2.run.dataset_paths import DatasetPaths
 class Dataset:
     def __init__(self, save_loc: Path) -> None:
         self.root = save_loc
-        self.unit_ids: list[int] = []
+        self._unit_ids: list[int] = []
 
         pass
 
@@ -19,37 +20,50 @@ class Dataset:
     def paths(self):
         return DatasetPaths(self.root)
 
-    def download(self):
-        pass  # access the dataset, choose the correct unit_ids, move raw geometry to folder ~ may still be a dataframe at this point
-
     def downselect(self):
         valid_ids = find_and_write_valid_unit_ids(self.paths.unit_ids_csv)
-        self.unit_ids = valid_ids
+        self._unit_ids = valid_ids
 
     def pre_process(self):
-        df = access_dataset()
-        for id in tqdm(self.unit_ids, desc="pre-processing"):
-            write_unit(df, id, self.paths.preprocessed_case_tuples(str(id)))
+        # TODO: move this complex logic away
+        full_df = access_dataset().collect()
+        partitioned_dict = full_df.partition_by("unit_id", as_dict=True)
+        unit_dfs = {k[0]: v for k, v in partitioned_dict.items()}
+        for id in tqdm(self._unit_ids, desc="pre-processing"):
+            unit_df = unit_dfs.get(id)
+            if unit_df is None:
+                continue
+            try:
+                write_unit(unit_df, self.paths.preprocessed_case_tuples(str(id)))
+            except Exception as e:
+                logger.error(f"Problem proccessing {unit_df}: {e}")
+
+    @property
+    def true_ids(self):
+        # check pre-process folder
+        return sorted(
+            [int(i.name) for i in self.paths.pre_processed.iterdir() if i.is_dir()]
+        )
 
     def get(self, ix: int):
-        return self.unit_ids[ix]
+        return self.true_ids[ix]
 
     def __len__(self):
-        return len(self.unit_ids)
+        return len(self.true_ids)
 
 
 class DataLoader:
     def __init__(self, dataset: Dataset, batch_size: int) -> None:
         self.dataset = dataset
-        assert dataset.unit_ids
+        assert dataset.true_ids
         self.batch_size = batch_size
         self.map = self.map_ids()
 
     def map_ids(self):
         def map_ix(x: int):
-            return (x - 1) // self.batch_size
+            return (x) // self.batch_size
 
-        return {unit_ix: map_ix(unit_ix) for unit_ix in self.dataset.unit_ids}
+        return {unit_ix: map_ix(ix) for ix, unit_ix in enumerate(self.dataset.true_ids)}
 
     def get_batch_by_ix(self, ix: int):
         return [k for k, v in self.map.items() if v == ix]

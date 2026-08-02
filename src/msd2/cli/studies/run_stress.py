@@ -11,16 +11,12 @@ runstress = App("rs")
 @runstress.command()
 def fc():
     ds = Dataset(ProjectPaths.data.test_msd)
-    ds.downselect()
-    ds.pre_process()
+    # ds.downselect()
+    # ds.pre_process()
 
     dl = DataLoader(ds, 50)
     print(len(dl))
-    batch = dl.get_batch_by_ix(0)
+
+    batch = dl.get_batch_by_ix(100)
+    # print(dl.map.values())
     print(batch)
-
-
-# TODOs:
-# add polyfix, utils4plans as editable imports
-# try to run this, identify all the issues that arise. look for best analogues for broken mappings between polyfix, utils and here..
-# focus is on geom, readin, and run modules
