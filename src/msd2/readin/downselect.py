@@ -6,6 +6,7 @@ from loguru import logger
 from rich import print
 from rich.pretty import pretty_repr
 from tabulate import tabulate
+from utils4plans.io import make_dir
 
 from msd2.readin.access import access_dataset
 from msd2.readin.filters import (
@@ -61,8 +62,9 @@ def find_and_write_valid_unit_ids(save_loc: Path):
 
     # TODO: optionally save or not
     df = pl.DataFrame(data={"ids": valid_ids}).sort(by="ids")
+    make_dir(save_loc)
     df.write_csv(save_loc)
     logger.success(f"Wrote file to {save_loc}")
-    return valid_ids  # or ids..
+    return [int(x) for x in valid_ids]  # or ids..
 
     # write_json(valid_ids, DynamicPaths.valid_ids_json, OVERWRITE=True)

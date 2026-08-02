@@ -10,7 +10,6 @@ runstress = App("rs")
 
 @runstress.command()
 def fc():
-    p = 0
     ds = Dataset(ProjectPaths.data.test_msd)
     ds.downselect()
     ds.pre_process()

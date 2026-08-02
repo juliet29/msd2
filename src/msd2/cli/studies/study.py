@@ -1,4 +1,5 @@
 from cyclopts import App
+from utils4plans.logs import logset
 
 from msd2.cli.studies.run_stress import runstress
 

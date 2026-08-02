@@ -1,7 +1,8 @@
 from pathlib import Path
 from typing import NamedTuple
 
-from loguru import logger
+import polars as pl
+from dataframely import LazyFrame
 from polyfix.geometry.ortho import FancyOrthoDomain
 from polyfix.layout.interfaces import Layout
 from polyfix.pydantic_models import layout_to_model
@@ -14,8 +15,9 @@ from msd2.geom.connectivity import Edge, extract_connectivity_graph
 from msd2.geom.create import df_unit_to_room_and_connection_data
 from msd2.geom.interfaces import MSDEdgeModel, MSDEdgesModel, RoomData
 from msd2.readin.access import (
-    access_datasets_by_unit_ids,
+    access_dataset,
 )
+from msd2.readin.interfaces import MSDSchema
 
 
 class CasePaths(NamedTuple):
@@ -28,7 +30,7 @@ def write_connectivity_edges_to_json(edges: list[Edge], path: Path):
         edges=[MSDEdgeModel(a=edge.a, b=edge.b, conn=edge.conn) for edge in edges]
     )
     data = msd_edges.model_dump()
-    write_json(data, path, OVERWRITE=True)
+    write_json(data, path)
 
 
 def write_room_data_to_json_as_layout(rooms: list[RoomData], path: Path):
@@ -38,11 +40,13 @@ def write_room_data_to_json_as_layout(rooms: list[RoomData], path: Path):
 
     layout = room_data_to_layout(rooms)
     data = layout_to_model(layout).model_dump()
-    write_json(data, path, OVERWRITE=True)
+    write_json(data, path)
 
 
-def write_unit(unit_id: float, case_data: CasePaths):
-    df = access_datasets_by_unit_ids([unit_id]).collect()
+def write_unit(lf: LazyFrame[MSDSchema] | None, unit_id: float, case_data: CasePaths):
+    if lf is None:
+        lf = access_dataset()
+    df = lf.filter(pl.col("unit_id").is_in([unit_id])).collect()
 
     rooms, connections = df_unit_to_room_and_connection_data(df)
     edges = extract_connectivity_graph(rooms, connections)
@@ -50,4 +54,4 @@ def write_unit(unit_id: float, case_data: CasePaths):
     write_room_data_to_json_as_layout(rooms, case_data.rooms)
     write_connectivity_edges_to_json(edges, case_data.edges)
 
-    logger.success(f"Finished writing layout and edges for {unit_id} ")
+    # logger.success(f"Finished writing layout and edges for {unit_id} ")

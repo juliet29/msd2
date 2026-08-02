@@ -1,12 +1,9 @@
-## dataset -> holds pipeline for  analyzing all cases..
-
-
-# TODO: class for storing all locations
-
-
 from pathlib import Path
 
+from tqdm import tqdm
+
 from msd2.geom.io import write_unit
+from msd2.readin.access import access_dataset
 from msd2.readin.downselect import find_and_write_valid_unit_ids
 from msd2.run.dataset_paths import DatasetPaths
 
@@ -30,11 +27,9 @@ class Dataset:
         self.unit_ids = valid_ids
 
     def pre_process(self):
-        for id in self.unit_ids:
-            # TODO tdqm? try exvep? only return succesful ids..
-            write_unit(id, self.paths.preprocessed_case_paths(str(id)))
-        # make ready for polyfix
-        pass
+        df = access_dataset()
+        for id in tqdm(self.unit_ids, desc="pre-processing"):
+            write_unit(df, id, self.paths.preprocessed_case_tuples(str(id)))
 
     def get(self, ix: int):
         return self.unit_ids[ix]
@@ -52,7 +47,7 @@ class DataLoader:
 
     def map_ids(self):
         def map_ix(x: int):
-            return ((x - 1) // self.batch_size) + 1
+            return (x - 1) // self.batch_size
 
         return {unit_ix: map_ix(unit_ix) for unit_ix in self.dataset.unit_ids}
 
