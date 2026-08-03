@@ -25,3 +25,6 @@ class DatasetPaths:
 
     def processed_case_path(self, unit_id: int):
         return self.processed / str(unit_id)
+
+    def processed_case_path_log(self, unit_id: int):
+        return self.processed / str(unit_id) / "out.log"
