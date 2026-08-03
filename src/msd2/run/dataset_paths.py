@@ -3,7 +3,7 @@ from pathlib import Path
 from msd2.geom.io import CasePaths
 
 
-class DatasetPaths:  # TODO: this has to be in a differnt folder..
+class DatasetPaths:
     def __init__(self, root: Path) -> None:
         self.root = root
 
@@ -16,11 +16,12 @@ class DatasetPaths:  # TODO: this has to be in a differnt folder..
         self.artifacts = self.root / "artifacts"
         self.unit_ids_csv = self.artifacts / "unit_ids.csv"
 
-    def preprocessed_case_tuples(self, case_name: str):
+    def preprocessed_case_tuples(self, unit_id_: int):
+        unit_id = str(unit_id_)
         return CasePaths(
-            edges=self.pre_processed / case_name / "edges.json",
-            rooms=self.pre_processed / case_name / "rooms.json",
+            edges=self.pre_processed / unit_id / "edges.json",
+            rooms=self.pre_processed / unit_id / "rooms.json",
         )
 
-    def preprocessed_case_paths(self, case_name: str):
-        return self.pre_processed / case_name
+    def processed_case_path(self, unit_id: int):
+        return self.processed / str(unit_id)
