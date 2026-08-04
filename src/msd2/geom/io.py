@@ -31,7 +31,8 @@ def write_connectivity_edges_to_json(edges: list[Edge], path: Path):
 
 def write_room_data_to_json_as_layout(rooms: list[RoomData], path: Path):
     def room_data_to_layout(rooms: list[RoomData]):
-        doms = map(lambda x: FancyOrthoDomain(x.coords, x.name), rooms)
+        filtered_rooms = [i for i in rooms if "balcony" not in i.name]
+        doms = map(lambda x: FancyOrthoDomain(x.coords, x.name), filtered_rooms)
         return Layout(list(doms))
 
     layout = room_data_to_layout(rooms)

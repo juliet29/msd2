@@ -20,9 +20,12 @@ class Dataset:
     def paths(self):
         return DatasetPaths(self.root)
 
-    def downselect(self):
+    def downselect(self, n: int | None = None):
         valid_ids = find_and_write_valid_unit_ids(self.paths.unit_ids_csv)
         self._unit_ids = valid_ids
+
+        if n:
+            self._unit_ids = valid_ids[:n]
 
     def pre_process(self):
         # TODO: move this complex logic away

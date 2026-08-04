@@ -12,6 +12,7 @@ TEMP_PATH = "/scratch/users/jnwagwu/msd2"
 class TempPaths:
     base = Path(TEMP_PATH)
     test_msd = base / "test_msd"
+    test_msd_100 = base / "test_msd_100"
 
 
 class ProjectPaths:
