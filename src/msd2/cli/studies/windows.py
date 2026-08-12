@@ -17,6 +17,9 @@ windows = App("wd")
 
 PATH = ProjectPaths.data.test_msd_100
 CASE = 4969
+CASE = 5155
+# CASE = 5153
+# CASE = 5153
 
 
 def plot_connection_data(data, title: str = "windows"):
@@ -54,7 +57,7 @@ def fc():
 
 
 @windows.command()
-def fcb():
+def fcb(CASE: int = CASE):
     df = access_datasets_by_unit_ids([CASE]).collect()
     data = make_connection_data(df)
 
@@ -62,10 +65,11 @@ def fcb():
 
     rotated_conn_data = arrange_windows(data, ds.paths.pr_case_angle(CASE))
     edges = make_edge_connections(ds.paths.pr_case_reconciled(CASE), rotated_conn_data)
-    return edges
 
-    # _ = plot_connection_data(rotated_conn_data)
-    # plt.show()
+    _ = plot_connection_data(rotated_conn_data)
+    plt.show()
+
+    return edges
 
 
 # rotatate windows and plot..

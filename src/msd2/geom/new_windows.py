@@ -18,12 +18,16 @@ from msd2.geom.interfaces import ConnectionData, Edge
 
 
 def arrange_windows(cd: list[ConnectionData], path_to_angle: Path):
+    ic(cd)
+
+    wds = [i for i in cd if i.entity_subtype == "WINDOW"]
+    if len(wds) == 0:
+        raise Exception(f"Dataset at {path_to_angle} has no windows..")
 
     data = read_json(path_to_angle)
     angle: float = data["angle"][0]
     ic(angle)
 
-    wds = [i for i in cd if i.entity_subtype == "WINDOW"]
     multipolygon = MultiPolygon([i.poly for i in wds])
     rotated = affinity.rotate(multipolygon, angle, use_radians=True)
     new_cd = [i._replace(poly=geom) for i, geom in zip(cd, shapely.get_parts(rotated))]
@@ -38,6 +42,7 @@ def is_exterior(boundary: Geometry, surface_line: LineString):
 
 
 def make_edge_connections(path_to_geom: Path, cd: list[ConnectionData]):
+    ic(cd)
     layout = read_layout_from_path(path_to_geom)
     polygons = [i.polygon for i in layout.domains]
     boundary = unary_union(polygons).boundary
