@@ -4,7 +4,7 @@ from loguru import logger
 from utils4plans.io import read_json
 
 from msd2.geom.create import make_connection_data
-from msd2.geom.new_windows import arrange_windows, make_edge_connections
+from msd2.geom.new_windows import arrange_exteriors, make_edge_connections
 from msd2.paths import ProjectPaths
 from msd2.readin.access import access_datasets_by_unit_ids
 from msd2.run.dataset import Dataset
@@ -63,7 +63,7 @@ def fcb(CASE: int = CASE):
 
     ds = Dataset(PATH)
 
-    rotated_conn_data = arrange_windows(data, ds.paths.pr_case_angle(CASE))
+    rotated_conn_data = arrange_exteriors(data, ds.paths.pr_case_angle(CASE))
     edges = make_edge_connections(ds.paths.pr_case_reconciled(CASE), rotated_conn_data)
 
     _ = plot_connection_data(rotated_conn_data)
