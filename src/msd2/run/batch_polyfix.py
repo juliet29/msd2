@@ -57,8 +57,8 @@ def handle_batch(dl: DataLoader, batch_ix: int, unit_ixes: list[int] = []):
     def handle_case(unit_id: int):
         paths = dl.dataset.paths
         geom_path = paths.preprocessed_case_tuples(unit_id).rooms
-        out_path = paths.processed_case_path(unit_id)
-        log_path = paths.processed_case_path_log(unit_id)
+        out_path = paths.pr_case(unit_id)
+        log_path = paths.pr_case_log(unit_id)
 
         with log_to_file(log_path):
             pf = PolyFixer(init_geom=geom_path, save_loc=out_path, save_angle=True)

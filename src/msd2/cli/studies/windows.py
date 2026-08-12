@@ -1,10 +1,13 @@
 import matplotlib
 from cyclopts import App
 from loguru import logger
+from utils4plans.io import read_json
 
 from msd2.geom.create import make_connection_data
+from msd2.geom.new_windows import arrange_windows, make_edge_connections
 from msd2.paths import ProjectPaths
 from msd2.readin.access import access_datasets_by_unit_ids
+from msd2.run.dataset import Dataset
 
 matplotlib.use("module://matplotlib-backend-kitty")
 import matplotlib.pyplot as plt
@@ -34,10 +37,35 @@ def plot_connection_data(data, title: str = "windows"):
 
 
 @windows.command()
+def fca():
+    path = PATH / "processed" / str(CASE) / "angle.json"
+    angle = read_json(path)
+    return angle["angle"]
+
+
+@windows.command()
 def fc():
     df = access_datasets_by_unit_ids([CASE]).collect()
     logger.debug(df)
     data = make_connection_data(df)
     wds = [i for i in data if i.entity_subtype == "WINDOW"]
-    fig = plot_connection_data(wds)
+    _ = plot_connection_data(wds)
     plt.show()
+
+
+@windows.command()
+def fcb():
+    df = access_datasets_by_unit_ids([CASE]).collect()
+    data = make_connection_data(df)
+
+    ds = Dataset(PATH)
+
+    rotated_conn_data = arrange_windows(data, ds.paths.pr_case_angle(CASE))
+    edges = make_edge_connections(ds.paths.pr_case_reconciled(CASE), rotated_conn_data)
+    return edges
+
+    # _ = plot_connection_data(rotated_conn_data)
+    # plt.show()
+
+
+# rotatate windows and plot..

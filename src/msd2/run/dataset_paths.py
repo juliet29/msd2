@@ -23,8 +23,14 @@ class DatasetPaths:
             rooms=self.pre_processed / unit_id / "rooms.json",
         )
 
-    def processed_case_path(self, unit_id: int):
+    def pr_case(self, unit_id: int):
         return self.processed / str(unit_id)
 
-    def processed_case_path_log(self, unit_id: int):
+    def pr_case_log(self, unit_id: int):
         return self.processed / str(unit_id) / "out.log"
+
+    def pr_case_angle(self, unit_id: int):
+        return self.processed / str(unit_id) / "angle.json"
+
+    def pr_case_reconciled(self, unit_id: int):
+        return self.processed / str(unit_id) / "reconcile/out.json"
