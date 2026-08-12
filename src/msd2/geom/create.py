@@ -1,5 +1,5 @@
-import shapely as sp
 import polars as pl
+import shapely as sp
 from dataframely import DataFrame
 
 from msd2.geom.interfaces import ConnectionData, RoomData
@@ -45,7 +45,5 @@ def make_connection_data(df: DataFrame[MSDSchema]):
 def df_unit_to_room_and_connection_data(df: DataFrame[MSDSchema]):
     # assuming has already been filtered to the unit id..
     area_df = df.filter(pl.col("entity_type") == "area")
-    connection_df = df.filter(pl.col("entity_type") == "opening")
     rooms = make_room_data(MSDSchema.validate(area_df))
-    connections = make_connection_data(MSDSchema.validate(connection_df))
-    return rooms, connections
+    return rooms

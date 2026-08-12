@@ -4,7 +4,7 @@ from loguru import logger
 from tqdm import tqdm
 
 from msd2.geom.io import write_unit
-from msd2.readin.access import access_dataset
+from msd2.readin.access import PartitionedDataFrame
 from msd2.readin.downselect import find_and_write_valid_unit_ids
 from msd2.run.dataset_paths import DatasetPaths
 
@@ -27,17 +27,17 @@ class Dataset:
         if n:
             self._unit_ids = valid_ids[:n]
 
+    @property
+    def partitioned_df(self):
+        return PartitionedDataFrame()
+
     def pre_process(self):
-        # TODO: move this complex logic away
-        full_df = access_dataset().collect()
-        partitioned_dict = full_df.partition_by("unit_id", as_dict=True)
-        unit_dfs = {k[0]: v for k, v in partitioned_dict.items()}
         for id in tqdm(self._unit_ids, desc="pre-processing"):
-            unit_df = unit_dfs.get(id)
+            unit_df = self.partitioned_df.get_unit_df(id)
             if unit_df is None:
                 continue
             try:
-                write_unit(unit_df, self.paths.preprocessed_case_tuples(str(id)))
+                write_unit(unit_df, self.paths.preprocessed_case_tuples(id))
             except Exception as e:
                 logger.error(f"Problem proccessing {unit_df}: {e}")
 

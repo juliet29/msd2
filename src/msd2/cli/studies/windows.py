@@ -1,12 +1,12 @@
 import matplotlib
 from cyclopts import App
 from loguru import logger
-from utils4plans.io import read_json
 
+from msd2.ep2.full_layout import FullLayout
 from msd2.geom.create import make_connection_data
-from msd2.geom.new_windows import arrange_exteriors, make_edge_connections
+from msd2.geom.exteriors import arrange_exteriors, make_edge_connections
 from msd2.paths import ProjectPaths
-from msd2.readin.access import access_datasets_by_unit_ids
+from msd2.readin.access import PartitionedDataFrame, access_datasets_by_unit_ids
 from msd2.run.dataset import Dataset
 
 matplotlib.use("module://matplotlib-backend-kitty")
@@ -40,13 +40,6 @@ def plot_connection_data(data, title: str = "windows"):
 
 
 @windows.command()
-def fca():
-    path = PATH / "processed" / str(CASE) / "angle.json"
-    angle = read_json(path)
-    return angle["angle"]
-
-
-@windows.command()
 def fc():
     df = access_datasets_by_unit_ids([CASE]).collect()
     logger.debug(df)
@@ -72,4 +65,13 @@ def fcb(CASE: int = CASE):
     return edges
 
 
-# rotatate windows and plot..
+@windows.command()
+def fd(CASE: int = CASE):
+    ds = Dataset(PATH)
+    df = PartitionedDataFrame().get_unit_df(CASE)
+    assert df is not None
+
+    fl = FullLayout(
+        ds.paths.pr_case_reconciled(CASE), ds.paths.pr_case_angle(CASE), CASE, df
+    )
+    return fl.entrance_door

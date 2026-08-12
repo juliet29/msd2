@@ -6,9 +6,9 @@ from dataframely import DataFrame
 from polyfix.main.main_class import read_layout_from_path
 from utils4plans.lists import get_unique_one
 
-from msd2.geom.connectivity import extract_interior_edges
 from msd2.geom.create import make_connection_data, make_room_data
-from msd2.geom.new_windows import arrange_exteriors, make_edge_connections
+from msd2.geom.exteriors import arrange_exteriors, make_edge_connections
+from msd2.geom.interiors import extract_interior_edges
 from msd2.readin.interfaces import MSDSchema
 
 
@@ -52,4 +52,4 @@ class FullLayout:
 
     @property
     def entrance_door(self):
-        return get_unique_one(self.exterior_edges, lambda x: x.conn == "Exterior Door")
+        return get_unique_one(self.exterior_edges, lambda x: x.conn == "Entrance Door")
