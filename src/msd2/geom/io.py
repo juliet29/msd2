@@ -10,7 +10,7 @@ from polyfix.pydantic_models import layout_to_model
 #
 from utils4plans.io import write_json
 
-from msd2.geom.connectivity import Edge, extract_connectivity_graph
+from msd2.geom.connectivity import Edge, extract_interior_edges
 from msd2.geom.create import df_unit_to_room_and_connection_data
 from msd2.geom.interfaces import MSDEdgeModel, MSDEdgesModel, RoomData
 from msd2.readin.interfaces import MSDSchema
@@ -42,7 +42,7 @@ def write_room_data_to_json_as_layout(rooms: list[RoomData], path: Path):
 
 def write_unit(unit_df: DataFrame[MSDSchema], case_data: CasePaths):
     rooms, connections = df_unit_to_room_and_connection_data(unit_df)
-    edges = extract_connectivity_graph(rooms, connections)
+    edges = extract_interior_edges(rooms, connections)
 
     write_room_data_to_json_as_layout(rooms, case_data.rooms)
     write_connectivity_edges_to_json(edges, case_data.edges)

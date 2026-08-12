@@ -16,6 +16,7 @@ from shapely import (
 from msd2.geom.interfaces import ConnectionData, Edge
 
 
+# TODO: promote to interfaces
 class EdgeProcessingError(Exception): ...
 
 

@@ -1,5 +1,6 @@
-from itertools import combinations, product
-from msd2.geom.interfaces import ConnectionData, RoomData, Edge, ConnectionGroups
+from itertools import combinations
+
+from msd2.geom.interfaces import ConnectionData, ConnectionGroups, Edge, RoomData
 
 PASSAGE_DISTANCE = 0.04
 DOOR_DISTANCE = 0.05
@@ -12,7 +13,8 @@ def split_connections(conns: list[ConnectionData]):
     return ConnectionGroups(doors, windows)
 
 
-def extract_connectivity_graph(rooms: list[RoomData], conns: list[ConnectionData]):
+def extract_interior_edges(rooms: list[RoomData], conns: list[ConnectionData]):
+    # TODO: hangle passages differently.. may have larger interior doors which should be accounted for..
 
     def passage_connection(
         a: RoomData, b: RoomData, edges: list[Edge], distance: float = PASSAGE_DISTANCE
@@ -35,18 +37,18 @@ def extract_connectivity_graph(rooms: list[RoomData], conns: list[ConnectionData
             edges.append(Edge(a.name, b.name, conn=door.roomtype))
         return edges
 
-    def window_connection(
-        a: RoomData,
-        window: ConnectionData,
-        edges: list[Edge],
-        distance: float = DOOR_DISTANCE,
-    ):
-        ap, wp = a.poly, window.poly
-        if ap.distance(wp) < distance:
-            # TODO: want to know the surface that it is on!
-            edges.append(Edge(a.name, WINDOW_EDGE, conn=window.roomtype))
-        return edges
-
+    # def window_connection(
+    #     a: RoomData,
+    #     window: ConnectionData,
+    #     edges: list[Edge],
+    #     distance: float = DOOR_DISTANCE,
+    # ):
+    #     ap, wp = a.poly, window.poly
+    #     if ap.distance(wp) < distance:
+    #         # TODO: want to know the surface that it is on!
+    #         edges.append(Edge(a.name, WINDOW_EDGE, conn=window.roomtype))
+    #     return edges
+    #
     edges: list[Edge] = []
     conn_groups = split_connections(conns)
 
@@ -57,9 +59,9 @@ def extract_connectivity_graph(rooms: list[RoomData], conns: list[ConnectionData
         for conn in conn_groups.doors:
             edges = door_connection(a, b, conn, edges)
 
-    room_window_pairs = product(rooms, conn_groups.windows)
-
-    for room, window in room_window_pairs:
-        edges = window_connection(room, window, edges)
+    # room_window_pairs = product(rooms, conn_groups.windows)
+    #
+    # for room, window in room_window_pairs:
+    #     edges = window_connection(room, window, edges)
 
     return edges
