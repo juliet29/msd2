@@ -1,9 +1,9 @@
 from typing import Literal, NamedTuple
-from utils4plans.geom import Coord
-from polyfix.geometry.ortho import FancyOrthoDomain
-import shapely as sp
-from pydantic import BaseModel
 
+import shapely as sp
+from polyfix.geometry.ortho import FancyOrthoDomain
+from pydantic import BaseModel
+from utils4plans.geom import Coord
 
 ROOM_NAMES = Literal[
     "Bedroom",

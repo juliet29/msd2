@@ -5,6 +5,7 @@ from loguru import logger
 from msd2.ep2.full_layout import FullLayout
 from msd2.geom.create import make_connection_data
 from msd2.geom.exteriors import arrange_exteriors, make_edge_connections
+from msd2.geom.rotate import rotate_layout_by_entrance_door
 from msd2.paths import ProjectPaths
 from msd2.readin.access import PartitionedDataFrame, access_datasets_by_unit_ids
 from msd2.run.dataset import Dataset
@@ -74,4 +75,4 @@ def fd(CASE: int = CASE):
     fl = FullLayout(
         ds.paths.pr_case_reconciled(CASE), ds.paths.pr_case_angle(CASE), CASE, df
     )
-    return fl.entrance_door
+    return rotate_layout_by_entrance_door(fl.layout, fl.entrance_door)
