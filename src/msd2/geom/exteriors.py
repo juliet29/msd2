@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import shapely
+from icecream import ic
 from loguru import logger
 from polars import read_json
 from polyfix.main.main_class import read_layout_from_path
@@ -20,17 +21,28 @@ from msd2.geom.interfaces import ConnectionData, Edge
 class EdgeProcessingError(Exception): ...
 
 
-def arrange_exteriors(cd: list[ConnectionData], path_to_angle: Path):
-    wds = [i for i in cd if i.roomtype == "Window" or i.roomtype == "Entrance Door"]
+def arrange_exteriors(cd: list[ConnectionData], path_to_angle_or_angle: Path | float):
+    wds = [i for i in cd if i.conn_type == "Window" or i.conn_type == "Entrance Door"]
     if len(wds) == 0:
-        raise EdgeProcessingError(f"Dataset at {path_to_angle} has no windows..")
-    data = read_json(path_to_angle)
-    angle: float = data["angle"][0]
+        raise EdgeProcessingError(
+            f"Dataset at {path_to_angle_or_angle} has no windows.."
+        )
 
+    if isinstance(path_to_angle_or_angle, Path):
+        data = read_json(path_to_angle_or_angle)
+        angle: float = data["angle"][0]
+    else:
+        angle = path_to_angle_or_angle
+
+    ic(angle)
     multipolygon = MultiPolygon([i.poly for i in wds])
     rotated = affinity.rotate(multipolygon, angle, use_radians=True)
     new_cd = [i._replace(poly=geom) for i, geom in zip(wds, shapely.get_parts(rotated))]
-    return new_cd
+    assert isinstance(angle, float)
+    return (
+        new_cd,
+        angle,
+    )  # TODO: this is becomeing a frequent pair, should promote as an interface
 
 
 def is_exterior(boundary: Geometry, surface_line: LineString):
@@ -40,9 +52,6 @@ def is_exterior(boundary: Geometry, surface_line: LineString):
 def are_edges_ok(edges: list[Edge]):
     if not edges:
         raise EdgeProcessingError("No valid edges!")
-    conn_types = [i.conn for i in edges]
-    if "Entrance Door" not in conn_types:
-        raise EdgeProcessingError("Entrance Door is not in edges!")
 
 
 def make_edge_connections(path_to_geom: Path, cd: list[ConnectionData]):
@@ -73,7 +82,7 @@ def make_edge_connections(path_to_geom: Path, cd: list[ConnectionData]):
                 f"Identified surface for {cd.id}, {surface} is not on the boundary of the layout: {e}, skipping.. "
             )
             return
-        return Edge(a=domain.name, b=surface.direction.name.upper(), conn=cd.roomtype)
+        return Edge(a=domain.name, b=surface.direction.name.upper(), conn=cd.conn_type)
 
     res = [handle_conn(i) for i in cd]
     edges = [i for i in res if i]

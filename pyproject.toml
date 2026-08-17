@@ -23,6 +23,7 @@ dependencies = [
   "pre-commit>=4.5.1",
   "ptpython>=3.0.32",
   "scikit-learn>=1.8.0",
+  "sympy>=1.14.0",
   "tabulate>=0.9.0",
   "tqdm>=4.67.1",
   "types-networkx>=3.6.0.20251127",
@@ -33,10 +34,14 @@ dependencies = [
 polyfix = { path = "../polyfix", editable = true }
 utils4plans = { path = "../utils4plans/", editable = true }
 
+
+# [tool.basedpyright]
+# include = ["src"]
+#
+
 [project.scripts]
 mm = "msd2.cli.main:main"
 ms = "msd2.cli.studies.study:main"
-msd-studies-quick = "msd2.cli.studies_quick:main"
 
 [build-system]
 requires = ["uv_build>=0.8.3,<0.9.0"]

@@ -1,3 +1,4 @@
+from enum import StrEnum
 from typing import Literal, NamedTuple
 
 import shapely as sp
@@ -26,6 +27,12 @@ CONNECTION_NAMES = Literal[
     "Entrance Door",
     "Window",
 ]
+
+
+class ConnectionNamesEnum(StrEnum):
+    DOOR = "Door"
+    ENTRANCE_DOOR = "Entrance Door"
+    WINDOW = "Window"
 
 
 class RoomData(NamedTuple):
@@ -59,7 +66,7 @@ class RoomData(NamedTuple):
 class ConnectionData(NamedTuple):
     entity_type: Literal["opening"]
     entity_subtype: str
-    roomtype: CONNECTION_NAMES
+    conn_type: CONNECTION_NAMES
     height: int
     id: int
 

@@ -27,7 +27,7 @@ def extract_interior_edges(rooms: list[RoomData], door_conns: list[ConnectionDat
     ):
         ap, bp, dp = a.poly, b.poly, door.poly
         if ap.distance(dp) < distance and bp.distance(dp) < distance:
-            edges.append(Edge(a.name, b.name, conn=door.roomtype))
+            edges.append(Edge(a.name, b.name, conn=door.conn_type))
         return edges
 
     edges: list[Edge] = []
