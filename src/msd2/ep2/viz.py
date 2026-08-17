@@ -60,27 +60,37 @@ class VisualizeFullLayout:
 
         # interior doors immediately resolved
         # complicated to plot though
-        self.fl.orient_entrance_door()
+        # self.fl.orient_entrance_door()
+        #
+        # assert self.fl.entrance_door_edge
+        # plot_edge_data(self.fl.layout, [self.fl.entrance_door_edge], ax, "red")
 
-        assert self.fl.entrance_door_edge
-        plot_edge_data(self.fl.layout, [self.fl.entrance_door_edge], ax, "red")
-
-        return ax
+    def plot_orient_exteriors(self, ax: Axes):
+        self.fl.orient_exteriors()
+        ax = plot_layout(self.fl.layout, ax=ax)
+        ax = plot_connection_data(self.fl.rotated_conns, ax=ax)
+        plot_edge_data(self.fl.layout, [self.fl.door_0], ax=ax, color="orange")
+        plot_edge_data(self.fl.layout, self.fl.window_0, ax=ax, color="orange")
 
     def plot_oriented_layout(self, ax: Axes):
+        self.fl.calculate_final_orient_angle()
         self.fl.orient_layout()
-        assert self.fl.entrance_door_edge
 
-        ax = plot_layout(self.fl.layout, ax=ax)
-        plot_edge_data(self.fl.layout, [self.fl.entrance_door_edge], ax, "orange")
+        ax = plot_layout(self.fl.oriented_layout, ax=ax)
+        # plot_edge_data(self.fl.layout, [self.fl.entrance_door_edge], ax, "orange")
 
         # self.fl.make_window_edges()
         # plot_edge_data(self.fl.layout, self.fl.window_edges, ax, "green")
 
     def make_plot(self):
         base_sz = 8
-        n_cols = 2
+        n_cols = 3
         fig, axes = plt.subplots(nrows=1, ncols=n_cols, figsize=(base_sz * 4, 4))
         self.plot_init_layout(axes[0])
-        self.plot_oriented_layout(axes[1])
+        self.plot_orient_exteriors(axes[1])
+        self.plot_oriented_layout(axes[2])
+        self.fl.orient_exteriors_final()
+        for ax in axes:
+            ax.set_aspect("equal")
+        # self.plot_oriented_layout(axes[1])
         return fig

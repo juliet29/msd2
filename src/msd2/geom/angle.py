@@ -36,6 +36,16 @@ class RadianAngle(NamedTuple):
 
         return f"{num_str}/{frac.denominator}"
 
+    def apply_to_vector(self, v: Vector):
+        x, y = v.x, v.y
+        a = self.angle
+        sina = math.sin(a)
+        cosa = math.cos(a)
+
+        xp = x * cosa - y * sina
+        yp = x * sina + y * cosa
+        return Vector(xp, yp)
+
 
 class VectorPair(NamedTuple):
     v1: Vector
