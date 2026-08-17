@@ -70,13 +70,17 @@ class VisualizeFullLayout:
         ax = plot_layout(self.fl.layout, ax=ax)
         ax = plot_connection_data(self.fl.rotated_conns, ax=ax)
         plot_edge_data(self.fl.layout, [self.fl.door_0], ax=ax, color="orange")
-        plot_edge_data(self.fl.layout, self.fl.window_0, ax=ax, color="orange")
+        plot_edge_data(self.fl.layout, self.fl.window_0, ax=ax, color="green")
 
     def plot_oriented_layout(self, ax: Axes):
         self.fl.calculate_final_orient_angle()
         self.fl.orient_layout()
 
         ax = plot_layout(self.fl.oriented_layout, ax=ax)
+
+        self.fl.orient_exteriors_final()
+        plot_edge_data(self.fl.oriented_layout, [self.fl.door_1], ax=ax, color="orange")
+        plot_edge_data(self.fl.oriented_layout, self.fl.window_1, ax=ax, color="green")
         # plot_edge_data(self.fl.layout, [self.fl.entrance_door_edge], ax, "orange")
 
         # self.fl.make_window_edges()
@@ -89,7 +93,7 @@ class VisualizeFullLayout:
         self.plot_init_layout(axes[0])
         self.plot_orient_exteriors(axes[1])
         self.plot_oriented_layout(axes[2])
-        self.fl.orient_exteriors_final()
+        # self.fl.orient_exteriors_final()
         for ax in axes:
             ax.set_aspect("equal")
         # self.plot_oriented_layout(axes[1])

@@ -14,6 +14,14 @@ class Vector(NamedTuple):
         return cls(v[0], v[1])  # pyright: ignore[reportArgumentType]
 
     @property
+    def rounded(self):
+        return (round(self.x), round(self.y))
+
+    @property
+    def to_rounded_geom_vector(self):
+        return GeomVector((*self.rounded, 0))
+
+    @property
     def magnitude(self):
         x, y = self.x, self.y
         return math.sqrt(x**2 + y**2)

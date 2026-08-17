@@ -106,7 +106,16 @@ class FullLayout:
 
     def orient_exteriors_final(self):
         assert self.angle is not None
-        rotate_edges(self.layout, self.angle, self.window_0)
+        self.oriented_edges = rotate_edges(
+            self.oriented_layout, self.angle, self.exterior_edges
+        )
+
+        self.door_1 = get_unique_one(
+            self.oriented_edges, lambda x: x.conn == OpeningVocab.entrance_door
+        )
+        self.window_1 = [
+            i for i in self.oriented_edges if i.conn == OpeningVocab.window
+        ]
 
     # def make_window_edges(self):
     #     assert self.angle is not None

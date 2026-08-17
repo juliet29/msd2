@@ -63,6 +63,15 @@ def rotate_edges(layout: Layout, angle: float, edges: list[Edge]):
         surface_vector = s.direction.aligned_vector
         v = Vector.from_geom_vector(surface_vector)
         new_vec = RadianAngle(angle).apply_to_vector(v)
-        ic(s.direction.name, new_vec)
+        # rounded_gv = new_vec.rounded  # .to_geom_vector
+        # ic(rounded_gv)
+        new_drn = CardinalDirections().get_drn_by_vector(new_vec.to_rounded_geom_vector)
+        assert new_drn
+        # ic(s.direction.name, new_vec, new_drn)
+
+        return e._replace(b=new_drn.name)
 
     handle(edges[0])
+    new_es = [handle(e) for e in edges]
+    ic(new_es)
+    return new_es
