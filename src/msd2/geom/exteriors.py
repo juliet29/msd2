@@ -40,7 +40,7 @@ def arrange_exteriors(cd: list[ConnectionData], path_to_angle_or_angle: Path | f
 
     if isinstance(path_to_angle_or_angle, Path):
         data = read_json(path_to_angle_or_angle)
-        angle: float = data["angle"][0]
+        angle: float = data["angle"]
     else:
         angle = path_to_angle_or_angle
 

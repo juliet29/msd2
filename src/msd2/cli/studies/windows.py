@@ -88,7 +88,7 @@ def fd(CASE: int = CASE):
 @windows.command()
 def fe(CASE: int = CASE):
     ds = Dataset(PATH)
-    df = PartitionedDataFrame().get_unit_df(CASE)
+    df = ds.partitioned_df.get_unit_df(CASE)
     assert df is not None
 
     fl = FullLayout(

@@ -9,7 +9,7 @@ from polyfix.geometry.vectors import CardinalDirections
 from polyfix.main.main_class import read_layout_from_path
 from utils4plans.lists import get_unique_one
 
-from msd2.geom.create import make_connection_data, make_room_data
+from msd2.geom.create import df_unit_to_room_data, make_connection_data
 from msd2.geom.exteriors import (
     arrange_exteriors,
     filter_duplicate_edges,
@@ -38,6 +38,18 @@ class OrientedLayout(NamedTuple):
     doors: list[Edge]
     passages: list[Edge]
     entrance_door: Edge
+
+
+def drop_balcony_edges(edges: list[Edge]):
+    name = "balcony"
+
+    def not_balcony(e: Edge):
+        if name in e.a.lower() or name in e.b.lower():
+            return False
+        return True
+
+    es = [i for i in edges if not_balcony(i)]
+    return es
 
 
 @dataclass  ## cant be dataclass anymore.. needs to be a proper classs
@@ -83,9 +95,9 @@ class FullLayout:
     def make_interior_edges(self):
         # rooms.json is written for the process of geom fixing..
         # going to re-read it here for on the fly door and window assignment
-        room_data = make_room_data(self.df)
+        room_data = df_unit_to_room_data(self.df)
         doors = [i for i in self.connections if i.conn_type == "Door"]
-        return extract_interior_edges(room_data, doors)
+        return drop_balcony_edges(extract_interior_edges(room_data, doors))
 
     def orient_exteriors(self):
         cs = [
@@ -98,7 +110,7 @@ class FullLayout:
         rotated_conns, angle = arrange_exteriors(cs, self.path_to_angle)
         # project to make connection
         edges = make_edge_connections(self.path_to_geom, rotated_conns)
-        edges = filter_duplicate_edges(edges)
+        edges = drop_balcony_edges(filter_duplicate_edges(edges))
 
         self.rotated_conns = rotated_conns
         self.exterior_edges = edges
