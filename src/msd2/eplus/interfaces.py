@@ -31,7 +31,10 @@ DETAIL_TYPES = Literal["window", "door"]
 
 
 def to_edge_group(edges: Iterable[MSDEdge], detail: DETAIL_TYPES, type_: EdgeGroupType):
-    ep_edges = [Edge(i.a, i.b) for i in edges]
+    if type_ == "Zone_Direction":
+        ep_edges = [Edge(i.a, i.b.upper()) for i in edges]
+    else:
+        ep_edges = [Edge(i.a, i.b) for i in edges]
     return EdgeGroup(ep_edges, detail, type_)
 
 
