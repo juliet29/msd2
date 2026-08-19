@@ -1,7 +1,7 @@
 from msd2.examples.examples import SampleUnit
 
+from msd2.geom.create import df_unit_to_room_data
 from msd2.geom.interiors import extract_interior_edges
-from msd2.geom.create import df_unit_to_room_and_connection_data
 from msd2.geom.io import write_unit
 from msd2.readin.access import access_datasets_by_unit_ids
 
@@ -20,7 +20,7 @@ class TestGenerateInitialData:
 
     @property
     def get_room_data(self):
-        rooms, connections = df_unit_to_room_and_connection_data(self.dataframe)
+        rooms, connections = df_unit_to_room_data(self.dataframe)
         return rooms, connections
 
     def test_df_to_room_data(self):

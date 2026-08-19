@@ -1,10 +1,13 @@
 from pathlib import Path
 
+from loguru import logger
+
 from msd2.geom.io import CasePaths
 
 
 class DatasetPaths:
     def __init__(self, root: Path) -> None:
+        logger.info(f"Intializing dataset paths for {root}")
         self.root = root
 
         self.data = self.root / "data"
@@ -19,7 +22,6 @@ class DatasetPaths:
     def preprocessed_case_tuples(self, unit_id_: int):
         unit_id = str(unit_id_)
         return CasePaths(
-            edges=self.pre_processed / unit_id / "edges.json",
             rooms=self.pre_processed / unit_id / "rooms.json",
         )
 

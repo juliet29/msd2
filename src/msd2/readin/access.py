@@ -38,6 +38,7 @@ def access_datasets_by_unit_ids(
 
 class PartitionedDataFrame:
     def __init__(self) -> None:
+        logger.info("Partitioning dataframe...")
         self.res: dict[int, pl.DataFrame] = self.partition_df()
 
     def partition_df(self):

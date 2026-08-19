@@ -10,7 +10,7 @@ from polyfix.pydantic_models import layout_to_model
 #
 from utils4plans.io import write_json
 
-from msd2.geom.create import df_unit_to_room_and_connection_data
+from msd2.geom.create import df_unit_to_room_data
 from msd2.geom.interfaces import RoomData
 from msd2.readin.interfaces import MSDSchema
 
@@ -31,7 +31,7 @@ def write_room_data_to_json_as_layout(rooms: list[RoomData], path: Path):
 
 
 def write_unit(unit_df: DataFrame[MSDSchema], case_data: CasePaths):
-    rooms = df_unit_to_room_and_connection_data(unit_df)
+    rooms = df_unit_to_room_data(unit_df)
     write_room_data_to_json_as_layout(rooms, case_data.rooms)
 
     # logger.success(f"Finished writing layout and edges for {unit_id} ")

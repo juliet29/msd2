@@ -1,10 +1,9 @@
 from pathlib import Path
 
 import shapely
-from icecream import ic
 from loguru import logger
-from polars import read_json
 from polyfix.main.main_class import read_layout_from_path
+from rich.pretty import pretty_repr
 from shapely import (
     Geometry,
     LineString,
@@ -13,6 +12,7 @@ from shapely import (
     affinity,
     unary_union,
 )
+from utils4plans.io import read_json
 
 from msd2.geom.interfaces import ConnectionData, Edge
 
@@ -21,12 +21,22 @@ from msd2.geom.interfaces import ConnectionData, Edge
 class EdgeProcessingError(Exception): ...
 
 
+def check_sufficient_items(items: list[Edge] | list[ConnectionData]):
+    if len(items) == 1 or len(items) == 0:
+        raise EdgeProcessingError(
+            f"Dataset either doesn't have windows or an entrance door. Stopping. \nItems:\n {pretty_repr(items)}"
+        )
+
+
+def filter_duplicate_edges(edges: list[Edge]):
+    res = list(set(edges))
+    check_sufficient_items(res)
+    return res
+
+
 def arrange_exteriors(cd: list[ConnectionData], path_to_angle_or_angle: Path | float):
     wds = [i for i in cd if i.conn_type == "Window" or i.conn_type == "Entrance Door"]
-    if len(wds) == 0:
-        raise EdgeProcessingError(
-            f"Dataset at {path_to_angle_or_angle} has no windows.."
-        )
+    check_sufficient_items(wds)
 
     if isinstance(path_to_angle_or_angle, Path):
         data = read_json(path_to_angle_or_angle)
@@ -34,7 +44,6 @@ def arrange_exteriors(cd: list[ConnectionData], path_to_angle_or_angle: Path | f
     else:
         angle = path_to_angle_or_angle
 
-    ic(angle)
     multipolygon = MultiPolygon([i.poly for i in wds])
     rotated = affinity.rotate(multipolygon, angle, use_radians=True)
     new_cd = [i._replace(poly=geom) for i, geom in zip(wds, shapely.get_parts(rotated))]

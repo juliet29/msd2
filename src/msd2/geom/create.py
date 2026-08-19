@@ -42,8 +42,9 @@ def make_connection_data(df: DataFrame[MSDSchema]):
     return connections
 
 
-def df_unit_to_room_and_connection_data(df: DataFrame[MSDSchema]):
-    # assuming has already been filtered to the unit id..
+def df_unit_to_room_data(df: DataFrame[MSDSchema], drop_balconies: bool = True):
     area_df = df.filter(pl.col("entity_type") == "area")
     rooms = make_room_data(MSDSchema.validate(area_df))
+    if drop_balconies:
+        return [i for i in rooms if "Balcony" not in i.entity_subtype]
     return rooms

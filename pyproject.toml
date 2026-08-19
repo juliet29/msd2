@@ -33,6 +33,7 @@ dependencies = [
 [tool.uv.sources]
 polyfix = { path = "../polyfix", editable = true }
 utils4plans = { path = "../utils4plans/", editable = true }
+plan2eplus = { path = "../plan2eplus/", editable = true }
 
 
 # [tool.basedpyright]

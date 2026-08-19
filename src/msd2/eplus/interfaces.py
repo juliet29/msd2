@@ -1,8 +1,5 @@
-from pathlib import Path
 from typing import Iterable, Literal, NamedTuple
 
-from polyfix.geometry.ortho import FancyOrthoDomain
-from polyfix.pydantic_models import LayoutModel
 from plan2eplus.geometry.coords import Coord
 from plan2eplus.geometry.ortho_domain import OrthoDomain
 from plan2eplus.ops.subsurfaces.interfaces import Edge, Location
@@ -13,45 +10,36 @@ from plan2eplus.ops.subsurfaces.user_interfaces import (
     EdgeGroupType,
 )
 from plan2eplus.ops.zones.user_interface import Room
-from utils4plans.io import read_json
+from polyfix.geometry.layout import Layout
+from polyfix.geometry.ortho import FancyOrthoDomain
 
-from msd2.geom.interfaces import MSDEdgeModel, MSDEdgesModel
-
-
-class GeomPlan(LayoutModel):
-
-    def ezcase_rooms(self, room_height: float):
-        def domain_to_room(id: int, dom: FancyOrthoDomain):
-            coords = map(lambda x: Coord(*x), dom.coords)
-            ortho_dom = OrthoDomain(list(coords))
-            return Room(id, dom.name, ortho_dom, room_height, reverse_coords=True)
-
-        layout = self.to_layout()
-        rooms = [domain_to_room(ix, i) for ix, i in enumerate(layout.domains)]
-        return rooms
+from msd2.ep2.full_layout import OrientedLayout
+from msd2.geom.interfaces import Edge as MSDEdge
 
 
-def read_layout_to_ezcase_rooms(path: Path, room_height: float):
-    data = read_json(path)
-    geom_plan = GeomPlan.model_validate(data)
-    return geom_plan.ezcase_rooms(room_height)
+def layout_to_ezcase_rooms(layout: Layout, room_height: float):
+    def domain_to_room(id: int, dom: FancyOrthoDomain):
+        coords = map(lambda x: Coord(*x), dom.coords)
+        ortho_dom = OrthoDomain(list(coords))
+        return Room(id, dom.name, ortho_dom, room_height, reverse_coords=True)
+
+    rooms = [domain_to_room(ix, i) for ix, i in enumerate(layout.domains)]
+    return rooms
 
 
 DETAIL_TYPES = Literal["window", "door"]
 
 
-def to_edge_group(
-    edges: Iterable[MSDEdgeModel], detail: DETAIL_TYPES, type_: EdgeGroupType
-):
+def to_edge_group(edges: Iterable[MSDEdge], detail: DETAIL_TYPES, type_: EdgeGroupType):
     ep_edges = [Edge(i.a, i.b) for i in edges]
     return EdgeGroup(ep_edges, detail, type_)
 
 
 class DistinguishedEdgeGroups(NamedTuple):
-    exterior_door: Iterable[MSDEdgeModel]
-    interior_door: Iterable[MSDEdgeModel]
-    window: Iterable[MSDEdgeModel]
-    airboundary: Iterable[MSDEdgeModel]
+    exterior_door: Iterable[MSDEdge]
+    interior_door: Iterable[MSDEdge]
+    window: Iterable[MSDEdge]
+    airboundary: Iterable[MSDEdge]
 
     @property
     def exterior_door_edges(self):
@@ -72,26 +60,17 @@ class DistinguishedEdgeGroups(NamedTuple):
         )  # TODO: this might be a special type
 
     @property
-    def simple_edges(self):
+    def simple_edge_groups(self):
         return [self.interior_door_edges, self.window_edges]
 
 
-class IncomingEgdesModel(MSDEdgesModel):
-    @property
-    def distinguished_edge_groups(self):
-        ext = filter(lambda x: x.conn == "Entrance Door", self.edges)
-        inte = filter(lambda x: x.conn == "Door", self.edges)
-        window = filter(lambda x: x.conn == "Window", self.edges)
-        airboundary = filter(lambda x: x.conn == "Passage", self.edges)
-        return DistinguishedEdgeGroups(ext, inte, window, airboundary)
-
-
-def read_edges_to_ezcase_edge_groups(path: Path):
-    data = read_json(path)
-    distinguished_edges = IncomingEgdesModel.model_validate(
-        data
-    ).distinguished_edge_groups
-    return distinguished_edges
+def edges_to_ezcase_edge_groups(ol: OrientedLayout):
+    return DistinguishedEdgeGroups(
+        exterior_door=[ol.entrance_door],
+        interior_door=ol.doors,
+        window=ol.windows,
+        airboundary=ol.passages,
+    )
 
 
 def make_details(room_height: float):

@@ -1,8 +1,13 @@
+from pathlib import Path
+
 import matplotlib
 from cyclopts import App
 from loguru import logger
+from plan2eplus.ops.run_settings.user_interfaces import AnalysisPeriod
 
+from msd2.config import MSDConfigSchema
 from msd2.ep2.full_layout import FullLayout
+from msd2.ep2.model import layout_to_idf
 from msd2.ep2.viz import VisualizeFullLayout
 from msd2.geom.create import make_connection_data
 from msd2.geom.exteriors import arrange_exteriors, make_edge_connections
@@ -78,7 +83,17 @@ def fd(CASE: int = CASE):
     viz = VisualizeFullLayout(fl)
     viz.make_plot()
     plt.show()
-    # fl.orient_layout()
-    # fl.make_window_edges()
-    # return fl.window_edges
-    # return rotate_layout_by_entrance_door(fl.layout, fl.entrance_door)
+
+
+@windows.command()
+def fe(CASE: int = CASE):
+    ds = Dataset(PATH)
+    df = PartitionedDataFrame().get_unit_df(CASE)
+    assert df is not None
+
+    fl = FullLayout(
+        ds.paths.pr_case_reconciled(CASE), ds.paths.pr_case_angle(CASE), CASE, df
+    )
+    cfg = MSDConfigSchema(3, Path(""), AnalysisPeriod("", 1, 2, 2, 3))
+    case = layout_to_idf(fl, cfg)
+    return case

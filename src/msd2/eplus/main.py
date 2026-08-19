@@ -2,23 +2,24 @@ from collections import Counter
 from pathlib import Path
 
 from loguru import logger
+from plan2eplus.ezcase.ez import EZ, RunVariablesInput
+from plan2eplus.ops.subsurfaces.logic.select import get_zones_by_plan_name
 from plan2eplus.ops.subsurfaces.user_interfaces import (
     Detail,
+    Edge,
     EdgeGroup,
     SubsurfaceInputs,
-    Edge,
 )
+from plan2eplus.ops.zones.user_interface import Room
 from rich.pretty import pretty_repr
+
 from msd2.config import MSDConfig
 from msd2.eplus.interfaces import (
     DETAIL_TYPES,
     make_details,
     read_edges_to_ezcase_edge_groups,
-    read_layout_to_ezcase_rooms,
+    read_layout_path_to_ezcase_rooms,
 )
-from plan2eplus.ezcase.ez import EZ, RunVariablesInput
-from plan2eplus.ops.zones.user_interface import Room
-from plan2eplus.ops.subsurfaces.logic.select import get_zones_by_plan_name
 
 
 def handle_windows(case: EZ, windows_edge_group: EdgeGroup):
@@ -29,8 +30,9 @@ def handle_windows(case: EZ, windows_edge_group: EdgeGroup):
         # find first surface with an outside boundary condition
         potential_surfs = list(
             filter(
-                lambda x: x.boundary_condition == "outdoors"
-                and x.surface_type == "wall",
+                lambda x: (
+                    x.boundary_condition == "outdoors" and x.surface_type == "wall"
+                ),
                 zone_a.surfaces,
             )
         )
@@ -79,7 +81,7 @@ def generate_idf(
     rooms: list[Room],
     edge_groups: list[EdgeGroup],
     details: dict[DETAIL_TYPES, Detail],
-    out_path: Path,
+    out_path: Path | None,
     run: bool = False,
 ):
     case = EZ(output_path=out_path)
@@ -89,23 +91,9 @@ def generate_idf(
     logger.debug(len(corrected_edge_groups))
 
     subsurface_inputs = SubsurfaceInputs(
-        corrected_edge_groups, details  # pyright: ignore[reportArgumentType]
+        corrected_edge_groups,
+        details,  # pyright: ignore[reportArgumentType]
     )
-    # counter = 0
-    # for edge_group in corrected_edge_groups:
-    #     for edge in edge_group.edges:
-    #         counter += 1
-    #         logger.debug(counter)
-    #         try:
-    #             singular_edge_group = EdgeGroup(
-    #                 [edge], edge_group.detail, edge_group.type_
-    #             )
-    #             subsurface_inputs = SubsurfaceInputs(
-    #                 singular_edge_group, details  # pyright: ignore[reportArgumentType]
-    #             )
-    #             case.add_subsurfaces(subsurface_inputs)
-    #         except ValueError as e:
-    #             logger.error(f"Error when trying to add edge {edge}: {e}")
     case.add_subsurfaces(subsurface_inputs)
 
     sinfo = [
@@ -117,9 +105,9 @@ def generate_idf(
 
     case.add_constructions()
     case.add_airflow_network()
-    case.save_and_run(
-        output_path=out_path, run=run, save=True
-    )  # TODO: shouldlnt have to specify twice in different places.
+    # case.save_and_run(
+    #     output_path=out_path, run=run, save=True
+    # )  # TODO: shouldlnt have to specify twice in different places.
     return case
 
 
@@ -131,7 +119,7 @@ def layout_to_idf(
 ):
 
     msd_config = MSDConfig(msd_config_path)
-    rooms = read_layout_to_ezcase_rooms(layout_path, msd_config.config.room_height)
+    rooms = read_layout_path_to_ezcase_rooms(layout_path, msd_config.config.room_height)
 
     edge_group_holder = read_edges_to_ezcase_edge_groups(edge_path)
     egs = [edge_group_holder.interior_door_edges, edge_group_holder.window_edges]

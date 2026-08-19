@@ -1,14 +1,21 @@
 from dataclasses import dataclass
 from pathlib import Path
+from typing import NamedTuple
 
 import polars as pl
 from dataframely import DataFrame
+from polyfix.geometry.layout import Layout
 from polyfix.geometry.vectors import CardinalDirections
 from polyfix.main.main_class import read_layout_from_path
 from utils4plans.lists import get_unique_one
 
 from msd2.geom.create import make_connection_data, make_room_data
-from msd2.geom.exteriors import arrange_exteriors, make_edge_connections
+from msd2.geom.exteriors import (
+    arrange_exteriors,
+    filter_duplicate_edges,
+    make_edge_connections,
+)
+from msd2.geom.interfaces import Edge
 from msd2.geom.interiors import extract_interior_edges
 from msd2.geom.rotate import (
     calculate_angle_to_goal_orientation,
@@ -21,6 +28,16 @@ from msd2.readin.interfaces import MSDSchema
 class OpeningVocab:
     entrance_door = "Entrance Door"
     window = "Window"
+    door = "Door"
+    passage = "Passage"
+
+
+class OrientedLayout(NamedTuple):
+    layout: Layout
+    windows: list[Edge]
+    doors: list[Edge]
+    passages: list[Edge]
+    entrance_door: Edge
 
 
 @dataclass  ## cant be dataclass anymore.. needs to be a proper classs
@@ -59,8 +76,6 @@ class FullLayout:
         return read_layout_from_path(self.path_to_geom)
 
     def make_connections(self):
-        # reading this from the df..  / may be filterd, or may not be yet..
-
         connection_df = self.df.filter(pl.col("entity_type") == "opening")
         connections = make_connection_data(MSDSchema.validate(connection_df))
         return connections
@@ -70,7 +85,6 @@ class FullLayout:
         # going to re-read it here for on the fly door and window assignment
         room_data = make_room_data(self.df)
         doors = [i for i in self.connections if i.conn_type == "Door"]
-        # TODO: raise exception if no doors
         return extract_interior_edges(room_data, doors)
 
     def orient_exteriors(self):
@@ -80,9 +94,11 @@ class FullLayout:
             if i.conn_type == OpeningVocab.entrance_door
             or i.conn_type == OpeningVocab.window
         ]
+
         rotated_conns, angle = arrange_exteriors(cs, self.path_to_angle)
         # project to make connection
         edges = make_edge_connections(self.path_to_geom, rotated_conns)
+        edges = filter_duplicate_edges(edges)
 
         self.rotated_conns = rotated_conns
         self.exterior_edges = edges
@@ -117,21 +133,13 @@ class FullLayout:
             i for i in self.oriented_edges if i.conn == OpeningVocab.window
         ]
 
-    # def make_window_edges(self):
-    #     assert self.angle is not None
-    #     assert self.entrance_door_edge is not None
-    #
-    #     window_conns = [
-    #         i for i in self.connections if i.conn_type == OpeningVocab.window
-    #     ]
-    #     rotated_connections, _ = arrange_exteriors(window_conns, self.angle)
-    #     edges = make_edge_connections(self.path_to_geom, rotated_connections)
-    #     self.window_edges = edges
-    #
-    # @property
-    # def windows(self):
-    #     return [i for i in self.exterior_edges if i.conn == "Window"]
-    #
-    # @property
-    # def entrance_door(self):
-    #     return get_unique_one(self.exterior_edges, lambda x: x.conn == "Entrance Door")
+    def to_oriented_layout(self):
+        self.orient_exteriors()
+        self.calculate_final_orient_angle()
+        self.orient_layout()
+        self.orient_exteriors_final()
+        doors = [i for i in self.interior_edges if i.conn == OpeningVocab.door]
+        passages = [i for i in self.interior_edges if i.conn == OpeningVocab.passage]
+        return OrientedLayout(
+            self.oriented_layout, self.window_1, doors, passages, self.door_1
+        )

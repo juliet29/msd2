@@ -24,7 +24,8 @@ def clear_dir():
 @runstress.command()
 def fc():
     ds = Dataset(PATH)
-    ds.downselect(n=80)
+    artifacts_path = ProjectPaths.data.test_msd / "artifacts/unit_ids.csv"
+    ds.downselect(csv_path=artifacts_path, n=22)
     ds.pre_process()
     logger.debug(ds.true_ids)
 

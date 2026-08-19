@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import polars as pl
 from loguru import logger
 from tqdm import tqdm
 
@@ -11,30 +12,33 @@ from msd2.run.dataset_paths import DatasetPaths
 
 class Dataset:
     def __init__(self, save_loc: Path) -> None:
+        logger.info(f"Initializing dataset at {save_loc}")
         self.root = save_loc
         self._unit_ids: list[int] = []
+        self.paths = DatasetPaths(self.root)
+        self.partitioned_df = PartitionedDataFrame()
 
-        pass
+    def downselect(self, csv_path: Path | None = None, n: int | None = None):
+        if csv_path:
+            assert csv_path.exists()
+            logger.info(f"Reading unit ids from {csv_path}")
+            res: list[float] = pl.read_csv(csv_path).get_column("ids").to_list()
+            valid_ids = [int(i) for i in res]
 
-    @property
-    def paths(self):
-        return DatasetPaths(self.root)
-
-    def downselect(self, n: int | None = None):
-        valid_ids = find_and_write_valid_unit_ids(self.paths.unit_ids_csv)
+            # pl.read_csv(csv_path)
+        else:
+            logger.info("Finding valid unit ids")
+            valid_ids = find_and_write_valid_unit_ids(self.paths.unit_ids_csv)
         self._unit_ids = valid_ids
 
         if n:
             self._unit_ids = valid_ids[:n]
 
-    @property
-    def partitioned_df(self):
-        return PartitionedDataFrame()
-
     def pre_process(self):
         for id in tqdm(self._unit_ids, desc="pre-processing"):
             unit_df = self.partitioned_df.get_unit_df(id)
             if unit_df is None:
+                logger.warning(f"Could not find data for {unit_df}")
                 continue
             try:
                 write_unit(unit_df, self.paths.preprocessed_case_tuples(id))
