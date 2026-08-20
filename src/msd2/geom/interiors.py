@@ -1,7 +1,5 @@
 from itertools import combinations
 
-from icecream import ic
-
 from msd2.geom.interfaces import ConnectionData, Edge, RoomData
 
 PASSAGE_DISTANCE = 0.04
@@ -39,7 +37,6 @@ def extract_interior_edges(rooms: list[RoomData], door_conns: list[ConnectionDat
     edges: list[Edge] = []
 
     room_combos = list(combinations(rooms, 2))
-    ic(len(rooms), len(room_combos), len(door_conns))
     for a, b in room_combos:
         # ic(a.name, b.name)
         edges = add_passage_connection_edges(a, b, edges)

@@ -22,6 +22,7 @@ dependencies = [
   "polyfix",
   "pre-commit>=4.5.1",
   "ptpython>=3.0.32",
+  "redun>=0.44.1",
   "scikit-learn>=1.8.0",
   "sympy>=1.14.0",
   "tabulate>=0.9.0",

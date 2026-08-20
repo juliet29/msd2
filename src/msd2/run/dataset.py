@@ -4,7 +4,7 @@ import polars as pl
 from loguru import logger
 from tqdm import tqdm
 
-from msd2.geom.io import write_unit
+from msd2.geom.create import write_unit
 from msd2.readin.access import PartitionedDataFrame
 from msd2.readin.downselect import find_and_write_valid_unit_ids
 from msd2.run.dataset_paths import DatasetPaths
@@ -41,7 +41,9 @@ class Dataset:
                 logger.warning(f"Could not find data for {unit_df}")
                 continue
             try:
-                write_unit(unit_df, self.paths.preprocessed_case_tuples(id))
+                pre_process_paths = self.paths.unit(id).pre_process
+                write_unit(unit_df, pre_process_paths.layout)
+                unit_df.write_parquet(pre_process_paths.unit_df)
             except Exception as e:
                 logger.error(f"Problem proccessing {unit_df}: {e}")
 

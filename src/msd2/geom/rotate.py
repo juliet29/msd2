@@ -1,6 +1,5 @@
 from typing import cast, get_args
 
-from icecream import ic
 from loguru import logger
 from polyfix.geometry.layout import Layout
 from polyfix.geometry.ortho import FancyOrthoDomain
@@ -37,7 +36,6 @@ def calculate_angle_to_goal_orientation(
     angle = VectorPair.from_geom_vectors(
         surface_vector, gd.aligned_vector
     ).directed_angle
-    # ic(angle, surface.vector.norm(), surface_vector)
     logger.info(
         f"Converting {surface.direction.name} to {gd.name}. Rotating layout by {RadianAngle(angle)} radians. "
     )
@@ -49,7 +47,6 @@ def rotate_layout(layout: Layout, angle: float):
     rotated = affinity.rotate(multipolygon, angle, use_radians=True)
     prec = [set_precision(i, grid_size=1e-8) for i in get_parts(rotated)]
 
-    # ic(len(shapely.get_parts(prec)), len(shapely.get_parts(rotated)))
     new_domains = [
         FancyOrthoDomain.from_shapely_polygon(new_poly, dom.name)
         for new_poly, dom in zip(prec, layout.domains)
@@ -63,15 +60,11 @@ def rotate_edges(layout: Layout, angle: float, edges: list[Edge]):
         surface_vector = s.direction.aligned_vector
         v = Vector.from_geom_vector(surface_vector)
         new_vec = RadianAngle(angle).apply_to_vector(v)
-        # rounded_gv = new_vec.rounded  # .to_geom_vector
-        # ic(rounded_gv)
         new_drn = CardinalDirections().get_drn_by_vector(new_vec.to_rounded_geom_vector)
         assert new_drn
-        # ic(s.direction.name, new_vec, new_drn)
 
         return e._replace(b=new_drn.name)
 
     handle(edges[0])
     new_es = [handle(e) for e in edges]
-    ic(new_es)
     return new_es

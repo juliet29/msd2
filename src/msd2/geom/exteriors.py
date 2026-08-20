@@ -14,17 +14,33 @@ from shapely import (
 )
 from utils4plans.io import read_json
 
-from msd2.geom.interfaces import ConnectionData, Edge
+from msd2.geom.interfaces import ConnectionData, Edge, OpeningVocab
 
 
 # TODO: promote to interfaces
 class EdgeProcessingError(Exception): ...
 
 
+class ConnectionProcessingError(Exception): ...
+
+
+class DroppedEntranceDoorError(Exception): ...
+
+
+def select_exterior_openings(connections: list[ConnectionData]) -> list[ConnectionData]:
+    entrance_doors = [c for c in connections if c.conn_type == OpeningVocab.entrance_door]
+    if not entrance_doors:
+        raise ConnectionProcessingError("No entrance door!")
+    windows = [c for c in connections if c.conn_type == OpeningVocab.window]
+    if not windows:
+        raise ConnectionProcessingError("No windows found!")
+    return windows + entrance_doors
+
+
 def check_sufficient_items(items: list[Edge] | list[ConnectionData]):
-    if len(items) == 1 or len(items) == 0:
+    if len(items) <= 1:
         raise EdgeProcessingError(
-            f"Dataset either doesn't have windows or an entrance door. Stopping. \nItems:\n {pretty_repr(items)}"
+            f"Need at least two exterior openings, found {len(items)}. \nItems:\n {pretty_repr(items)}"
         )
 
 
@@ -35,32 +51,38 @@ def filter_duplicate_edges(edges: list[Edge]):
 
 
 def arrange_exteriors(cd: list[ConnectionData], path_to_angle_or_angle: Path | float):
-    wds = [i for i in cd if i.conn_type == "Window" or i.conn_type == "Entrance Door"]
-    check_sufficient_items(wds)
-
     if isinstance(path_to_angle_or_angle, Path):
-        data = read_json(path_to_angle_or_angle)
-        angle: float = data["angle"]
+        angle: float = read_json(path_to_angle_or_angle)["angle"]
     else:
         angle = path_to_angle_or_angle
-
-    multipolygon = MultiPolygon([i.poly for i in wds])
-    rotated = affinity.rotate(multipolygon, angle, use_radians=True)
-    new_cd = [i._replace(poly=geom) for i, geom in zip(wds, shapely.get_parts(rotated))]
     assert isinstance(angle, float)
+
+    multipolygon = MultiPolygon([i.poly for i in cd])
+    rotated = affinity.rotate(multipolygon, angle, use_radians=True)
+    new_cd = [i._replace(poly=geom) for i, geom in zip(cd, shapely.get_parts(rotated))]
     return (
         new_cd,
         angle,
     )  # TODO: this is becomeing a frequent pair, should promote as an interface
 
 
-def is_exterior(boundary: Geometry, surface_line: LineString):
-    assert shapely.contains(boundary, surface_line)
+def is_exterior(boundary: Geometry, surface_line: LineString) -> bool:
+    return shapely.contains(boundary, surface_line)
 
 
 def are_edges_ok(edges: list[Edge]):
     if not edges:
         raise EdgeProcessingError("No valid edges!")
+
+
+def get_exterior_entrance_door(edges: list[Edge]) -> Edge:
+    entrance_doors = [e for e in edges if e.conn == OpeningVocab.entrance_door]
+    if len(entrance_doors) != 1:
+        raise DroppedEntranceDoorError(
+            f"Expected exactly one exterior entrance-door edge, found {len(entrance_doors)}; "
+            "the entrance door does not map to an exterior boundary surface."
+        )
+    return entrance_doors[0]
 
 
 def make_edge_connections(path_to_geom: Path, cd: list[ConnectionData]):
@@ -84,11 +106,9 @@ def make_edge_connections(path_to_geom: Path, cd: list[ConnectionData]):
         surface_tree = surface_trees[ix]
         surf_ix = surface_tree.nearest(cd.poly)
         surface = domain.surfaces[surf_ix]
-        try:
-            is_exterior(boundary, surface.coords.shapely_line)
-        except AssertionError as e:
+        if not is_exterior(boundary, surface.coords.shapely_line):
             logger.critical(
-                f"Identified surface for {cd.id}, {surface} is not on the boundary of the layout: {e}, skipping.. "
+                f"Identified surface for {cd.id}, {surface} is not on the boundary of the layout, skipping.. "
             )
             return
         return Edge(a=domain.name, b=surface.direction.name.upper(), conn=cd.conn_type)

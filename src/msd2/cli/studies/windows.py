@@ -4,6 +4,7 @@ import matplotlib
 from cyclopts import App
 from loguru import logger
 from plan2eplus.ops.run_settings.user_interfaces import AnalysisPeriod
+from plan2eplus.visuals.simple_plots import make_base_plot
 
 from msd2.config import MSDConfigSchema
 from msd2.ep2.full_layout import FullLayout
@@ -62,8 +63,10 @@ def fcb(CASE: int = CASE):
 
     ds = Dataset(PATH)
 
-    rotated_conn_data = arrange_exteriors(data, ds.paths.pr_case_angle(CASE))
-    edges = make_edge_connections(ds.paths.pr_case_reconciled(CASE), rotated_conn_data)
+    rotated_conn_data = arrange_exteriors(data, ds.paths.unit(CASE).process.angle)
+    edges = make_edge_connections(
+        ds.paths.unit(CASE).process.reconciled, rotated_conn_data
+    )
 
     _ = plot_connection_data(rotated_conn_data)
     plt.show()
@@ -78,7 +81,10 @@ def fd(CASE: int = CASE):
     assert df is not None
 
     fl = FullLayout(
-        ds.paths.pr_case_reconciled(CASE), ds.paths.pr_case_angle(CASE), CASE, df
+        ds.paths.unit(CASE).process.reconciled,
+        ds.paths.unit(CASE).process.angle,
+        CASE,
+        df,
     )
     viz = VisualizeFullLayout(fl)
     viz.make_plot()
@@ -92,8 +98,13 @@ def fe(CASE: int = CASE):
     assert df is not None
 
     fl = FullLayout(
-        ds.paths.pr_case_reconciled(CASE), ds.paths.pr_case_angle(CASE), CASE, df
+        ds.paths.unit(CASE).process.reconciled,
+        ds.paths.unit(CASE).process.angle,
+        CASE,
+        df,
     )
-    cfg = MSDConfigSchema(3, Path(""), AnalysisPeriod("", 1, 2, 2, 3))
+    cfg = MSDConfigSchema(3, Path(""), AnalysisPeriod("", 1, 2, 2, 3), Path(""))
     case = layout_to_idf(fl, cfg)
-    return case
+    bp = make_base_plot(case, cardinal_expansion_factor=1.1)
+    bp.show()
+    # return case

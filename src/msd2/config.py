@@ -13,6 +13,7 @@ class MSDConfigSchema:
     room_height: int  # meters
     weather_file: Path
     analysis_period: AnalysisPeriod
+    save_loc: Path
 
 
 @dataclass

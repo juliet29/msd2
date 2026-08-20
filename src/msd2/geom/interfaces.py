@@ -35,6 +35,13 @@ class ConnectionNamesEnum(StrEnum):
     WINDOW = "Window"
 
 
+class OpeningVocab:
+    entrance_door = "Entrance Door"
+    window = "Window"
+    door = "Door"
+    passage = "Passage"
+
+
 class RoomData(NamedTuple):
     entity_type: str
     entity_subtype: str

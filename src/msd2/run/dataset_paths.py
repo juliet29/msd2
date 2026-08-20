@@ -1,8 +1,78 @@
+from dataclasses import dataclass
 from pathlib import Path
 
 from loguru import logger
 
-from msd2.geom.io import CasePaths
+
+@dataclass
+class PreProcessPaths:
+    root: Path
+
+    @property
+    def layout(self):
+        return self.root / "rooms.json"
+
+    @property
+    def unit_df(self):
+        return self.root / "unit.parquet"
+
+
+@dataclass
+class ProcessPaths:
+    root: Path
+
+    @property
+    def case(self):
+        return self.root
+
+    @property
+    def log(self):
+        return self.root / "out.log"
+
+    @property
+    def angle(self):
+        return self.root / "angle.json"
+
+    @property
+    def reconciled(self):
+        return self.root / "reconcile/out.json"
+
+
+@dataclass
+class EplusPaths:
+    root: Path
+
+    @property
+    def case(self):
+        return self.root
+
+    @property
+    def log(self):
+        return self.root / "out.log"
+
+    @property
+    def fig(self):
+        return self.root / "out.png"
+
+
+@dataclass
+class UnitPaths:
+    unit_id: str
+    pre_processed_path: Path
+    processed_path: Path
+    eplus_model_path: Path
+
+    @property
+    def pre_process(self):
+        return PreProcessPaths(self.pre_processed_path / self.unit_id)
+
+    @property
+    def process(self):
+        return ProcessPaths(self.processed_path / self.unit_id)
+
+    @property
+    def eplus(self):
+        return EplusPaths(self.eplus_model_path / self.unit_id)
 
 
 class DatasetPaths:
@@ -15,24 +85,17 @@ class DatasetPaths:
 
         self.pre_processed = self.root / "pre_processed"
         self.processed = self.root / "processed"
+        self.eplus_model = self.root / "model"
 
         self.artifacts = self.root / "artifacts"
         self.unit_ids_csv = self.artifacts / "unit_ids.csv"
 
-    def preprocessed_case_tuples(self, unit_id_: int):
-        unit_id = str(unit_id_)
-        return CasePaths(
-            rooms=self.pre_processed / unit_id / "rooms.json",
+        self.redun_db = self.root / ".redun" / "redun.db"
+
+    def unit(self, unit_id: int):
+        return UnitPaths(
+            str(unit_id),
+            self.pre_processed,
+            self.processed,
+            self.eplus_model,
         )
-
-    def pr_case(self, unit_id: int):
-        return self.processed / str(unit_id)
-
-    def pr_case_log(self, unit_id: int):
-        return self.processed / str(unit_id) / "out.log"
-
-    def pr_case_angle(self, unit_id: int):
-        return self.processed / str(unit_id) / "angle.json"
-
-    def pr_case_reconciled(self, unit_id: int):
-        return self.processed / str(unit_id) / "reconcile/out.json"

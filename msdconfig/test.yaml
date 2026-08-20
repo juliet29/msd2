@@ -1,9 +1,11 @@
 room_height: 3 # m
-weather_file: "../../../weather_data/CA_PALO-ALTO-AP_724937S_20.epw"
+weather_file: "/home/groups/risheej/jnwagwu/fpopt/msd2/static/_01_inputs/local_ep_files/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 
 analysis_period:
   name: "testing"
   st_month: 6
   st_day: 1
-  end_month: 7
-  end_day: 30
+  end_month: 6
+  end_day: 3
+
+save_loc: ""

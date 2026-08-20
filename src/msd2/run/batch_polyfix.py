@@ -8,6 +8,7 @@ from polyfix.main.main_class import PolyFixer
 from rich.pretty import pretty_repr
 from tqdm import tqdm
 from utils4plans.io import make_dir, write_json
+from utils4plans.io.extras.figures import save_mpl_fig
 from utils4plans.logs import logset
 
 from msd2.run.dataset import DataLoader
@@ -56,9 +57,10 @@ class BatchManager:
 def handle_batch(dl: DataLoader, batch_ix: int, unit_ixes: list[int] = []):
     def handle_case(unit_id: int):
         paths = dl.dataset.paths
-        geom_path = paths.preprocessed_case_tuples(unit_id).rooms
-        out_path = paths.pr_case(unit_id)
-        log_path = paths.pr_case_log(unit_id)
+        unit_paths = paths.unit(unit_id)
+        geom_path = unit_paths.pre_process.layout
+        out_path = unit_paths.process.case
+        log_path = unit_paths.process.log
 
         with log_to_file(log_path):
             pf = PolyFixer(init_geom=geom_path, save_loc=out_path, save_angle=True)
@@ -93,3 +95,26 @@ def handle_batch(dl: DataLoader, batch_ix: int, unit_ixes: list[int] = []):
 
     logset()
     bm.show_report()
+
+
+def handle_energy_model_making(unit_id: int, path: Path):
+    ds = Dataset(PATH)
+    df = ds.partitioned_df.get_unit_df(CASE)
+    assert df is not None
+
+    # try and log errors
+    fl = FullLayout(
+        ds.paths.pr_case_reconciled(CASE), ds.paths.pr_case_angle(CASE), CASE, df
+    )
+
+    cfg = MSDConfigSchema(3, Path(""), AnalysisPeriod("", 1, 2, 2, 3), Path(""))
+
+    # try and log errors
+    case = layout_to_idf(fl, cfg)
+    bp = make_base_plot(case, cardinal_expansion_factor=1.1)
+    save_mpl_fig(bp.fig, ds.paths.e_fig)
+
+    # try and log errors
+    case.save_and_run(save=True, run=True)
+
+    pass

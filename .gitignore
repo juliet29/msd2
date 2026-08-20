@@ -1,8 +1,9 @@
 # Custom 
-static/_04_temp/snakemake/
-static/_03_models/
-static/_05_figures/
-
+static
+# static/_04_temp
+# static/_03_models/
+# static/_05_figures/
+#
 .snakemake/
 **/.DS_Store
 

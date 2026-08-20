@@ -7,15 +7,16 @@ from dataframely import DataFrame
 from polyfix.geometry.layout import Layout
 from polyfix.geometry.vectors import CardinalDirections
 from polyfix.main.main_class import read_layout_from_path
-from utils4plans.lists import get_unique_one
 
 from msd2.geom.create import df_unit_to_room_data, make_connection_data
 from msd2.geom.exteriors import (
     arrange_exteriors,
     filter_duplicate_edges,
+    get_exterior_entrance_door,
     make_edge_connections,
+    select_exterior_openings,
 )
-from msd2.geom.interfaces import Edge
+from msd2.geom.interfaces import Edge, OpeningVocab
 from msd2.geom.interiors import extract_interior_edges
 from msd2.geom.rotate import (
     calculate_angle_to_goal_orientation,
@@ -23,13 +24,6 @@ from msd2.geom.rotate import (
     rotate_layout,
 )
 from msd2.readin.interfaces import MSDSchema
-
-
-class OpeningVocab:
-    entrance_door = "Entrance Door"
-    window = "Window"
-    door = "Door"
-    passage = "Passage"
 
 
 class OrientedLayout(NamedTuple):
@@ -100,23 +94,17 @@ class FullLayout:
         return drop_balcony_edges(extract_interior_edges(room_data, doors))
 
     def orient_exteriors(self):
-        cs = [
-            i
-            for i in self.connections
-            if i.conn_type == OpeningVocab.entrance_door
-            or i.conn_type == OpeningVocab.window
-        ]
+        cs = select_exterior_openings(self.connections)
 
         rotated_conns, angle = arrange_exteriors(cs, self.path_to_angle)
-        # project to make connection
+
         edges = make_edge_connections(self.path_to_geom, rotated_conns)
         edges = drop_balcony_edges(filter_duplicate_edges(edges))
 
         self.rotated_conns = rotated_conns
         self.exterior_edges = edges
-        self.door_0 = get_unique_one(
-            self.exterior_edges, lambda x: x.conn == OpeningVocab.entrance_door
-        )
+
+        self.door_0 = get_exterior_entrance_door(self.exterior_edges)
         self.window_0 = [
             i for i in self.exterior_edges if i.conn == OpeningVocab.window
         ]
@@ -138,9 +126,7 @@ class FullLayout:
             self.oriented_layout, self.angle, self.exterior_edges
         )
 
-        self.door_1 = get_unique_one(
-            self.oriented_edges, lambda x: x.conn == OpeningVocab.entrance_door
-        )
+        self.door_1 = get_exterior_entrance_door(self.oriented_edges)
         self.window_1 = [
             i for i in self.oriented_edges if i.conn == OpeningVocab.window
         ]
